@@ -1,0 +1,729 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>The-K 더 캐보자</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+<style>
+  :root {
+    --blue-primary: #21409a;
+    --blue-accent: #2853f6;
+    --blue-light: #e1ebff;
+    color-scheme: light;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    font-family: "Pretendard", -apple-system, BlinkMacSystemFont, "Malgun Gothic", sans-serif;
+    background: #fff;
+    color: var(--blue-primary);
+  }
+
+  .page {
+    max-width: 1920px;
+    margin: 0 auto;
+  }
+
+  /* ---------- Header ---------- */
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: #fff;
+    width: 100%;
+  }
+
+  .gnb {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 50px min(160px, 8.3333vw);
+  }
+
+  .logo {
+    font-family: "Paperlogy", "Pretendard", sans-serif;
+    font-weight: 800;
+    font-size: 40px;
+    letter-spacing: -1.2px;
+    color: var(--blue-primary);
+    white-space: nowrap;
+    cursor: default;
+  }
+
+  /* flex-start (not center) so the scrollable range is always unambiguous —
+     .menu-track's auto margins below handle the "centered when it fits"
+     look, and once it overflows the row just scrolls normally from 0 */
+  nav.menu {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: flex-start;
+    height: 68px;
+    padding: 0 min(160px, 8.3333vw) 12px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+  }
+  nav.menu::-webkit-scrollbar { display: none; }
+
+  .menu-track {
+    display: flex;
+    align-items: center;
+    flex: none;
+    gap: 52px;
+    margin: 0 auto;
+  }
+
+  .tab-wrap {
+    position: relative;
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .tab-btn {
+    appearance: none;
+    border: none;
+    background: transparent;
+    font-family: inherit;
+    padding: 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .tab-btn:focus-visible {
+    outline: 2px solid var(--blue-accent);
+    outline-offset: 2px;
+  }
+
+  /* plain (inactive) label */
+  .tab-plain {
+    font-weight: 700;
+    font-size: 22px;
+    letter-spacing: -0.66px;
+    color: var(--blue-primary);
+    opacity: 0.5;
+    white-space: nowrap;
+    text-transform: uppercase;
+    transition: opacity 0.2s ease, color 0.2s ease;
+  }
+
+  .tab-btn:hover .tab-plain {
+    opacity: 1;
+    color: var(--blue-accent);
+  }
+
+  /* boxed (active) tab with scroll fill */
+  .tab-pill {
+    display: none;
+    position: relative;
+    overflow: hidden;
+    align-items: center;
+    justify-content: center;
+    background: var(--blue-light);
+    border-radius: 16px;
+    width: 300px;
+    height: 56px;
+    font-weight: 700;
+    font-size: 24px;
+    letter-spacing: -0.72px;
+  }
+
+  .tab-wrap.active .tab-plain { display: none; }
+  .tab-wrap.active .tab-pill { display: flex; }
+
+  .pill-label {
+    white-space: nowrap;
+    text-transform: uppercase;
+  }
+
+  .pill-label--base {
+    position: relative;
+    z-index: 1;
+    color: var(--blue-accent);
+  }
+
+  .pill-fill {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--blue-accent);
+    color: #fff;
+    clip-path: inset(0 100% 0 0);
+    will-change: clip-path;
+    z-index: 2;
+  }
+
+  /* ---------- Speech bubble (always visible on the active tab, left-aligned) ---------- */
+  .submenu {
+    display: none;
+    /* fixed + JS-computed left/bottom: nav.menu needs overflow-x:auto for
+       the no-wrap horizontal scroll, which forces overflow-y to clip too —
+       position:fixed is the only way for the tip to escape that clipping */
+    position: fixed;
+    flex-direction: column;
+    align-items: flex-start;
+    z-index: 10;
+  }
+
+  .tab-wrap.active .submenu {
+    display: flex;
+    /* single drop-shadow around the whole bubble silhouette (box + tail) */
+    filter: drop-shadow(0px 8px 9.1px rgba(0, 0, 0, 0.22));
+  }
+
+  .submenu-box {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+    background: #fff;
+    border-radius: 16px;
+    white-space: nowrap;
+  }
+
+  .submenu-box a {
+    font-family: inherit;
+    font-weight: 500;
+    font-size: 16px;
+    letter-spacing: -0.48px;
+    color: var(--blue-accent);
+    text-decoration: none;
+    cursor: pointer;
+    transition: font-weight 0.15s ease;
+  }
+
+  .submenu-box a:hover {
+    font-weight: 700;
+  }
+
+  .submenu-arrow {
+    position: relative;
+    z-index: 1;
+    width: 348px;
+    height: 30px;
+    margin-top: -12px;
+  }
+
+  /* ---------- Mobile tip (shared banner, shown below the header) ---------- */
+  .mobile-tip {
+    display: none;
+  }
+
+  /* ---------- Content ---------- */
+  main {
+    width: 100%;
+    line-height: 0;
+  }
+
+  .content-image {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .content-blank {
+    display: block;
+    width: 100%;
+    min-height: 800px;
+    background: #fff;
+  }
+
+  /* 복지혜택 mobile-only responsive frame: fixed-width foreground centered
+     over a background that fills the rest of the viewport and disappears
+     once the viewport narrows to the foreground's own width (375px) */
+  .benefit-frame {
+    display: none;
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+  }
+
+  .benefit-frame.active { display: block; }
+
+  .benefit-bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center top;
+    z-index: 0;
+  }
+
+  .benefit-fg {
+    position: relative;
+    z-index: 1;
+    display: block;
+    width: 375px;
+    height: auto;
+    margin: 0 auto;
+  }
+
+  /* header-only breakpoint: content images keep switching at 768px
+     (see the JS contentMobileQuery), but the header's own compact mobile
+     layout only kicks in at 420px */
+  @media (max-width: 420px) {
+    header { box-shadow: 0px 4px 5px rgba(0, 0, 0, 0.15); }
+
+    .gnb { padding: 40px 20px 24px 24px; }
+    .logo { font-size: 25px; letter-spacing: -0.76px; }
+
+    nav.menu {
+      flex-wrap: nowrap;
+      justify-content: flex-start;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      height: 48px;
+      padding: 0 24px 8px;
+    }
+    nav.menu::-webkit-scrollbar { display: none; }
+    .menu-track { gap: 12px; margin: 0; }
+
+    .tab-plain { font-size: 13px; letter-spacing: -0.39px; }
+    .tab-pill { width: 160px; height: 36px; border-radius: 12px; font-size: 13px; letter-spacing: -0.39px; }
+
+    /* per-tab desktop tip lives inside the horizontally-scrolling nav —
+       hide it and show the shared .mobile-tip banner below instead.
+       (must match .tab-wrap.active .submenu's specificity to actually win) */
+    .tab-wrap.active .submenu { display: none; }
+
+    .mobile-tip {
+      display: flex;
+      position: absolute;
+      left: 24px;
+      /* Figma: tip top sits 14px above the mobile header's bottom edge
+         (tip top=124 vs header height=138) */
+      top: calc(100% - 14px);
+      flex-direction: column-reverse;
+      align-items: flex-start;
+      z-index: 10;
+      opacity: 1;
+      filter: drop-shadow(0px 4px 7.5px rgba(0, 0, 0, 0.15));
+      transition: opacity 0.4s ease;
+    }
+    body.tip-collapsed .mobile-tip {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .mobile-tip .submenu-box {
+      margin-top: -12px;
+      gap: 12px;
+      padding: 12px;
+      border-radius: 12px;
+    }
+    .mobile-tip .submenu-box a { font-size: 13px; letter-spacing: -0.39px; }
+
+    .mobile-tip-arrow {
+      width: 278px;
+      height: 22px;
+      transform: scaleY(-1);
+    }
+  }
+</style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <div class="gnb">
+        <span class="logo">The-K 더 캐보자</span>
+      </div>
+      <nav class="menu" id="navMenu">
+       <div class="menu-track">
+        <div class="tab-wrap" data-key="firstpay" data-content="assets/content-firstpay-v2.jpg" data-content-mobile="assets/content-firstpay-mobile.jpg">
+          <button class="tab-btn" type="button">
+            <span class="tab-plain">#장기저축급여</span>
+            <span class="tab-pill">
+              <span class="pill-label pill-label--base">#장기저축급여</span>
+              <span class="pill-fill" aria-hidden="true"><span class="pill-label">#장기저축급여</span></span>
+            </span>
+          </button>
+          <div class="submenu">
+            <div class="submenu-box">
+              <a href="#">#장기저축급여</a>
+              <a href="#">#월급관리</a>
+              <a href="#">#평생월급</a>
+              <a href="#">#복리마법</a>
+            </div>
+            <svg class="submenu-arrow" viewBox="0 0 348 30" preserveAspectRatio="xMidYMin meet" xmlns="http://www.w3.org/2000/svg">
+              <path d="M32.5359 24C34.0755 26.6667 37.9245 26.6667 39.4641 24L45.5263 13.5C47.0659 10.8333 45.1414 7.5 42.0622 7.5H29.9378C26.8586 7.5 24.9341 10.8333 26.4737 13.5L32.5359 24Z" fill="white"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="tab-wrap" data-key="retire" data-content="assets/content-retire-v2.jpg" data-content-mobile="assets/content-retire-mobile.jpg">
+          <button class="tab-btn" type="button">
+            <span class="tab-plain">#분할급여금</span>
+            <span class="tab-pill">
+              <span class="pill-label pill-label--base">#분할급여금</span>
+              <span class="pill-fill" aria-hidden="true"><span class="pill-label">#분할급여금</span></span>
+            </span>
+          </button>
+          <div class="submenu">
+            <div class="submenu-box">
+              <a href="#">#퇴직후생활비</a>
+              <a href="#">#퇴직급여금수령방법</a>
+              <a href="#">#장기저축급여_퇴직급여금</a>
+              <a href="#">#일시금vs분할</a>
+            </div>
+            <svg class="submenu-arrow" viewBox="0 0 348 30" preserveAspectRatio="xMidYMin meet" xmlns="http://www.w3.org/2000/svg">
+              <path d="M32.5359 24C34.0755 26.6667 37.9245 26.6667 39.4641 24L45.5263 13.5C47.0659 10.8333 45.1414 7.5 42.0622 7.5H29.9378C26.8586 7.5 24.9341 10.8333 26.4737 13.5L32.5359 24Z" fill="white"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="tab-wrap" data-key="deposit" data-content="assets/content-deposit-v2.jpg" data-content-mobile="assets/content-deposit-mobile.jpg">
+          <button class="tab-btn" type="button">
+            <span class="tab-plain">#증좌신청</span>
+            <span class="tab-pill">
+              <span class="pill-label pill-label--base">#증좌신청</span>
+              <span class="pill-fill" aria-hidden="true"><span class="pill-label">#증좌신청</span></span>
+            </span>
+          </button>
+          <div class="submenu">
+            <div class="submenu-box">
+              <a href="#">#장기저축급여</a>
+              <a href="#">#급여율5.0%</a>
+              <a href="#">#급여율인상</a>
+              <a href="#">#증좌신청</a>
+            </div>
+            <svg class="submenu-arrow" viewBox="0 0 348 30" preserveAspectRatio="xMidYMin meet" xmlns="http://www.w3.org/2000/svg">
+              <path d="M32.5359 24C34.0755 26.6667 37.9245 26.6667 39.4641 24L45.5263 13.5C47.0659 10.8333 45.1414 7.5 42.0622 7.5H29.9378C26.8586 7.5 24.9341 10.8333 26.4737 13.5L32.5359 24Z" fill="white"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="tab-wrap active" data-key="benefit" data-content="assets/content.jpg">
+          <button class="tab-btn" type="button">
+            <span class="tab-plain">#복지혜택</span>
+            <span class="tab-pill">
+              <span class="pill-label pill-label--base">#복지혜택</span>
+              <span class="pill-fill" aria-hidden="true"><span class="pill-label">#복지혜택</span></span>
+            </span>
+          </button>
+          <div class="submenu">
+            <div class="submenu-box">
+              <a href="#">#복지혜택</a>
+              <a href="#">#이벤트혜택</a>
+              <a href="#">#회원복지</a>
+              <a href="#">#복지알림</a>
+            </div>
+            <svg class="submenu-arrow" viewBox="0 0 348 30" preserveAspectRatio="xMidYMin meet" xmlns="http://www.w3.org/2000/svg">
+              <path d="M32.5359 24C34.0755 26.6667 37.9245 26.6667 39.4641 24L45.5263 13.5C47.0659 10.8333 45.1414 7.5 42.0622 7.5H29.9378C26.8586 7.5 24.9341 10.8333 26.4737 13.5L32.5359 24Z" fill="white"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="tab-wrap" data-key="future" data-content="">
+          <button class="tab-btn" type="button">
+            <span class="tab-plain">#미래자산</span>
+            <span class="tab-pill">
+              <span class="pill-label pill-label--base">#미래자산</span>
+              <span class="pill-fill" aria-hidden="true"><span class="pill-label">#미래자산</span></span>
+            </span>
+          </button>
+          <div class="submenu">
+            <div class="submenu-box">
+              <a href="#">#미래자산</a>
+              <a href="#">#자산포트폴리오</a>
+              <a href="#">#맞춤형금융설계</a>
+              <a href="#">#스마트재테크</a>
+            </div>
+            <svg class="submenu-arrow" viewBox="0 0 348 30" preserveAspectRatio="xMidYMin meet" xmlns="http://www.w3.org/2000/svg">
+              <path d="M32.5359 24C34.0755 26.6667 37.9245 26.6667 39.4641 24L45.5263 13.5C47.0659 10.8333 45.1414 7.5 42.0622 7.5H29.9378C26.8586 7.5 24.9341 10.8333 26.4737 13.5L32.5359 24Z" fill="white"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="tab-wrap" data-key="lowtax" data-content="">
+          <button class="tab-btn" type="button">
+            <span class="tab-plain">#저율과세혜택</span>
+            <span class="tab-pill">
+              <span class="pill-label pill-label--base">#저율과세혜택</span>
+              <span class="pill-fill" aria-hidden="true"><span class="pill-label">#저율과세혜택</span></span>
+            </span>
+          </button>
+          <div class="submenu">
+            <div class="submenu-box">
+              <a href="#">#저율과세혜택</a>
+              <a href="#">#연복리효과</a>
+              <a href="#">#교직원전용상품</a>
+              <a href="#">#스마트재테크</a>
+            </div>
+            <svg class="submenu-arrow" viewBox="0 0 348 30" preserveAspectRatio="xMidYMin meet" xmlns="http://www.w3.org/2000/svg">
+              <path d="M32.5359 24C34.0755 26.6667 37.9245 26.6667 39.4641 24L45.5263 13.5C47.0659 10.8333 45.1414 7.5 42.0622 7.5H29.9378C26.8586 7.5 24.9341 10.8333 26.4737 13.5L32.5359 24Z" fill="white"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="tab-wrap" data-key="deduction" data-content="">
+          <button class="tab-btn" type="button">
+            <span class="tab-plain">#급여공제저축</span>
+            <span class="tab-pill">
+              <span class="pill-label pill-label--base">#급여공제저축</span>
+              <span class="pill-fill" aria-hidden="true"><span class="pill-label">#급여공제저축</span></span>
+            </span>
+          </button>
+          <div class="submenu">
+            <div class="submenu-box">
+              <a href="#">#급여공제저축</a>
+              <a href="#">#선저축후지출</a>
+              <a href="#">#쉬운목돈만들기</a>
+              <a href="#">#부담없는소액저축</a>
+            </div>
+            <svg class="submenu-arrow" viewBox="0 0 348 30" preserveAspectRatio="xMidYMin meet" xmlns="http://www.w3.org/2000/svg">
+              <path d="M32.5359 24C34.0755 26.6667 37.9245 26.6667 39.4641 24L45.5263 13.5C47.0659 10.8333 45.1414 7.5 42.0622 7.5H29.9378C26.8586 7.5 24.9341 10.8333 26.4737 13.5L32.5359 24Z" fill="white"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="tab-wrap" data-key="yearend" data-content="">
+          <button class="tab-btn" type="button">
+            <span class="tab-plain">#연말정산대비</span>
+            <span class="tab-pill">
+              <span class="pill-label pill-label--base">#연말정산대비</span>
+              <span class="pill-fill" aria-hidden="true"><span class="pill-label">#연말정산대비</span></span>
+            </span>
+          </button>
+          <div class="submenu">
+            <div class="submenu-box">
+              <a href="#">#연말정산대비</a>
+              <a href="#">#스마트한절세</a>
+              <a href="#">#퇴직급여금조회</a>
+              <a href="#">#내년재무목표</a>
+            </div>
+            <svg class="submenu-arrow" viewBox="0 0 348 30" preserveAspectRatio="xMidYMin meet" xmlns="http://www.w3.org/2000/svg">
+              <path d="M32.5359 24C34.0755 26.6667 37.9245 26.6667 39.4641 24L45.5263 13.5C47.0659 10.8333 45.1414 7.5 42.0622 7.5H29.9378C26.8586 7.5 24.9341 10.8333 26.4737 13.5L32.5359 24Z" fill="white"/>
+            </svg>
+          </div>
+        </div>
+       </div>
+      </nav>
+
+      <div class="mobile-tip" id="mobileTip">
+        <div class="submenu-box" id="mobileTipBox">
+          <a href="#">#복지혜택</a>
+          <a href="#">#이벤트혜택</a>
+          <a href="#">#회원복지</a>
+          <a href="#">#복지알림</a>
+        </div>
+        <svg class="mobile-tip-arrow" viewBox="0 0 278 22" preserveAspectRatio="xMidYMin meet" xmlns="http://www.w3.org/2000/svg">
+          <path d="M28.4019 17.5C29.5566 19.5 32.4434 19.5 33.5981 17.5L37.0622 11.5C38.2169 9.5 36.7735 7 34.4641 7H27.5359C25.2265 7 23.7831 9.5 24.9378 11.5L28.4019 17.5Z" fill="white"/>
+        </svg>
+      </div>
+    </header>
+
+    <main>
+      <img class="content-image" id="contentImage" src="assets/content.jpg" alt="The-K 더 캐보자 콘텐츠" />
+
+      <!-- 복지혜택 mobile only: fixed 375px-wide content over a full-width
+           background that shrinks with the viewport and is fully hidden
+           behind the content once the viewport reaches 375px -->
+      <div class="benefit-frame" id="benefitFrame">
+        <img class="benefit-bg" src="assets/benefit-bg-mobile.jpg" alt="" aria-hidden="true" />
+        <img class="benefit-fg" src="assets/benefit-fg-mobile.jpg" alt="The-K 더 캐보자 복지혜택" />
+      </div>
+    </main>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/ScrollTrigger.min.js"></script>
+  <script>
+    const tabWraps = document.querySelectorAll('.tab-wrap');
+    const contentImage = document.getElementById('contentImage');
+    const benefitFrame = document.getElementById('benefitFrame');
+    // content images (firstpay/retire/deposit) keep swapping at 768px
+    const contentMobileQuery = window.matchMedia('(max-width: 768px)');
+    // the header's own compact mobile layout only switches at 420px
+    const headerMobileQuery = window.matchMedia('(max-width: 420px)');
+
+    function applyContent(wrap) {
+      // 복지혜택 always gets the fixed-375px-foreground + shrinking-background
+      // treatment instead of the plain swapped <img>, at every width
+      const useBenefitFrame = wrap.dataset.key === 'benefit';
+      benefitFrame.classList.toggle('active', useBenefitFrame);
+
+      if (useBenefitFrame) {
+        contentImage.style.display = 'none';
+        const existingBlank = document.getElementById('contentBlank');
+        if (existingBlank) existingBlank.style.display = 'none';
+        return;
+      }
+
+      const src = (contentMobileQuery.matches && wrap.dataset.contentMobile)
+        ? wrap.dataset.contentMobile
+        : wrap.dataset.content;
+
+      if (src) {
+        contentImage.src = src;
+        contentImage.style.display = '';
+      } else {
+        contentImage.style.display = 'none';
+        let blank = document.getElementById('contentBlank');
+        if (!blank) {
+          blank = document.createElement('div');
+          blank.id = 'contentBlank';
+          blank.className = 'content-blank';
+          contentImage.insertAdjacentElement('afterend', blank);
+        }
+        blank.style.display = 'block';
+      }
+
+      const existingBlank = document.getElementById('contentBlank');
+      if (src && existingBlank) existingBlank.style.display = 'none';
+    }
+
+    const mobileTipBox = document.getElementById('mobileTipBox');
+    const navMenu = document.getElementById('navMenu');
+
+    // mobile: always scroll the active box to x:24, the same left inset
+    // the nav uses for its very first item.
+    // desktop (narrowed, still centered): leave the centered scroll position
+    // alone as long as the box is visible, and only snap it to x:24 once
+    // it would otherwise be scrolled out of view.
+    function scrollActiveIntoView(wrap, smooth) {
+      const navRect = navMenu.getBoundingClientRect();
+      const wrapRect = wrap.getBoundingClientRect();
+
+      if (!headerMobileQuery.matches) {
+        // .menu-track's auto margins already center it when everything
+        // fits, and nav.menu is flex-start so the scroll range is always
+        // unambiguous — only step in once the box is actually clipped, and
+        // never touch scrollLeft otherwise (so a manual left-scroll to see
+        // the earlier tabs is never fought or reset)
+        const visible = wrapRect.left >= navRect.left - 0.5 && wrapRect.right <= navRect.right + 0.5;
+        if (visible) return;
+      }
+
+      const delta = wrapRect.left - navRect.left;
+      const target = Math.max(0, navMenu.scrollLeft + delta - 24);
+      navMenu.scrollTo({ left: target, behavior: smooth ? 'smooth' : 'auto' });
+    }
+
+    // desktop: the tip is position:fixed (to escape nav.menu's forced
+    // overflow clipping), so its left/top have to be computed in JS against
+    // the active tab's actual on-screen position. In Figma the tip frame's
+    // top sits 58px above the box's top (tip top=89 vs box top=147 within
+    // the 215px header) — using `top` directly avoids innerHeight math.
+    function positionDesktopTip(wrap) {
+      const submenu = wrap.querySelector('.submenu');
+      if (!submenu) return;
+      const btnRect = wrap.querySelector('.tab-pill').getBoundingClientRect();
+      submenu.style.left = btnRect.left + 'px';
+      submenu.style.bottom = 'auto';
+      submenu.style.top = (btnRect.top - 58) + 'px';
+    }
+
+    function setActive(wrap, opts) {
+      tabWraps.forEach((w) => w.classList.remove('active'));
+      wrap.classList.add('active');
+      applyContent(wrap);
+
+      const tags = wrap.querySelector('.submenu-box');
+      if (tags) mobileTipBox.innerHTML = tags.innerHTML;
+
+      scrollActiveIntoView(wrap, !(opts && opts.instant));
+      positionDesktopTip(wrap);
+    }
+
+    tabWraps.forEach((wrap) => {
+      wrap.querySelector('.tab-btn').addEventListener('click', () => setActive(wrap));
+    });
+
+    const initialActive = document.querySelector('.tab-wrap.active');
+    if (initialActive) {
+      applyContent(initialActive);
+      scrollActiveIntoView(initialActive, false);
+      positionDesktopTip(initialActive);
+      // re-run once fonts/layout have fully settled, in case web font
+      // loading shifted tab widths after the first measurement
+      if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(() => {
+          scrollActiveIntoView(initialActive, false);
+          positionDesktopTip(initialActive);
+        });
+      }
+      window.addEventListener('load', () => {
+        scrollActiveIntoView(initialActive, false);
+        positionDesktopTip(initialActive);
+      });
+    }
+
+    contentMobileQuery.addEventListener('change', () => {
+      const activeWrap = document.querySelector('.tab-wrap.active');
+      if (activeWrap) applyContent(activeWrap);
+    });
+
+    headerMobileQuery.addEventListener('change', () => {
+      const activeWrap = document.querySelector('.tab-wrap.active');
+      if (activeWrap) {
+        scrollActiveIntoView(activeWrap, false);
+        positionDesktopTip(activeWrap);
+      }
+      updateTipVisibility();
+    });
+
+    // keep the active box centered without clipping on the left as the PC
+    // header shrinks, and pin it to x:24 the instant it would otherwise get
+    // cut off — rAF-throttled (not debounced) so it tracks live while the
+    // window is actively being dragged, not just after it settles
+    let resizeFrame = null;
+    window.addEventListener('resize', () => {
+      if (resizeFrame) return;
+      resizeFrame = requestAnimationFrame(() => {
+        resizeFrame = null;
+        const activeWrap = document.querySelector('.tab-wrap.active');
+        if (activeWrap) {
+          scrollActiveIntoView(activeWrap, false);
+          positionDesktopTip(activeWrap);
+        }
+      });
+    });
+
+    // desktop: re-align the tip if the narrow-window nav gets scrolled
+    // horizontally (nav.menu itself, not the page)
+    navMenu.addEventListener('scroll', () => {
+      const activeWrap = document.querySelector('.tab-wrap.active');
+      if (activeWrap) positionDesktopTip(activeWrap);
+    }, { passive: true });
+
+    // mobile only: tip shows on load, disappears once the page scrolls down
+    function updateTipVisibility() {
+      if (!headerMobileQuery.matches) {
+        document.body.classList.remove('tip-collapsed');
+        return;
+      }
+      document.body.classList.toggle('tip-collapsed', window.scrollY > 10);
+    }
+    window.addEventListener('scroll', updateTipVisibility, { passive: true });
+    updateTipVisibility();
+
+    // GSAP ScrollTrigger: whichever tab is active, its box fills left -> right
+    // mapped to the entire page scroll range.
+    gsap.registerPlugin(ScrollTrigger);
+
+    gsap.to('.pill-fill', {
+      clipPath: 'inset(0 0% 0 0)',
+      ease: 'none',
+      scrollTrigger: {
+        trigger: document.body,
+        start: 'top top',
+        end: 'max',
+        scrub: true,
+      },
+    });
+  </script>
+</body>
+</html>
