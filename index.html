@@ -270,10 +270,8 @@
     margin: 0 auto;
   }
 
-  /* header-only breakpoint: content images keep switching at 768px
-     (see the JS contentMobileQuery), but the header's own compact mobile
-     layout only kicks in at 420px */
-  @media (max-width: 420px) {
+  /* header mobile layout, same breakpoint as the content swap (768px) */
+  @media (max-width: 768px) {
     header { box-shadow: 0px 4px 5px rgba(0, 0, 0, 0.15); }
 
     .gnb { padding: 40px 20px 24px 24px; }
@@ -546,8 +544,8 @@
     const benefitFrame = document.getElementById('benefitFrame');
     // content images (firstpay/retire/deposit) keep swapping at 768px
     const contentMobileQuery = window.matchMedia('(max-width: 768px)');
-    // the header's own compact mobile layout only switches at 420px
-    const headerMobileQuery = window.matchMedia('(max-width: 420px)');
+    // header mobile layout uses the same 768px breakpoint
+    const headerMobileQuery = window.matchMedia('(max-width: 768px)');
 
     function applyContent(wrap) {
       // 복지혜택 always gets the fixed-375px-foreground + shrinking-background
@@ -626,6 +624,18 @@
       submenu.style.top = (btnRect.top - 58) + 'px';
     }
 
+    // mobile: the tip banner defaults to left:24px in CSS (matching where
+    // the box is scrolled to), but compute it from the box's actual
+    // position instead so it always lines up even in edge cases (e.g. the
+    // last tab, which may not have room to scroll all the way to x:24)
+    const mobileTip = document.getElementById('mobileTip');
+    const headerEl = document.querySelector('header');
+    function positionMobileTip(wrap) {
+      const headerRect = headerEl.getBoundingClientRect();
+      const btnRect = wrap.querySelector('.tab-pill').getBoundingClientRect();
+      mobileTip.style.left = (btnRect.left - headerRect.left) + 'px';
+    }
+
     function setActive(wrap, opts) {
       tabWraps.forEach((w) => w.classList.remove('active'));
       wrap.classList.add('active');
@@ -636,6 +646,7 @@
 
       scrollActiveIntoView(wrap, !(opts && opts.instant));
       positionDesktopTip(wrap);
+      positionMobileTip(wrap);
     }
 
     tabWraps.forEach((wrap) => {
@@ -647,17 +658,20 @@
       applyContent(initialActive);
       scrollActiveIntoView(initialActive, false);
       positionDesktopTip(initialActive);
+      positionMobileTip(initialActive);
       // re-run once fonts/layout have fully settled, in case web font
       // loading shifted tab widths after the first measurement
       if (document.fonts && document.fonts.ready) {
         document.fonts.ready.then(() => {
           scrollActiveIntoView(initialActive, false);
           positionDesktopTip(initialActive);
+          positionMobileTip(initialActive);
         });
       }
       window.addEventListener('load', () => {
         scrollActiveIntoView(initialActive, false);
         positionDesktopTip(initialActive);
+        positionMobileTip(initialActive);
       });
     }
 
@@ -671,6 +685,7 @@
       if (activeWrap) {
         scrollActiveIntoView(activeWrap, false);
         positionDesktopTip(activeWrap);
+        positionMobileTip(activeWrap);
       }
       updateTipVisibility();
     });
@@ -688,15 +703,18 @@
         if (activeWrap) {
           scrollActiveIntoView(activeWrap, false);
           positionDesktopTip(activeWrap);
+          positionMobileTip(activeWrap);
         }
       });
     });
 
-    // desktop: re-align the tip if the narrow-window nav gets scrolled
-    // horizontally (nav.menu itself, not the page)
+    // re-align the tip if nav.menu gets scrolled horizontally (desktop
+    // narrow-window scroll, or mobile's own horizontal scroll)
     navMenu.addEventListener('scroll', () => {
       const activeWrap = document.querySelector('.tab-wrap.active');
-      if (activeWrap) positionDesktopTip(activeWrap);
+      if (!activeWrap) return;
+      positionDesktopTip(activeWrap);
+      positionMobileTip(activeWrap);
     }, { passive: true });
 
     // mobile only: tip shows on load, disappears once the page scrolls down

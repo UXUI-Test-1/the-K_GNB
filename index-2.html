@@ -1,0 +1,738 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>The-K 더 캐보자</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+<style>
+  :root {
+    --blue-primary: #21409a;
+    --blue-accent: #2853f6;
+    --blue-light: #e1ebff;
+    --chip-border: #ebebeb;
+    --chip-gray: #909fcc;
+    color-scheme: light;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    font-family: "Pretendard", -apple-system, BlinkMacSystemFont, "Malgun Gothic", sans-serif;
+    background: #fff;
+    color: var(--blue-primary);
+  }
+
+  .page {
+    max-width: 1920px;
+    margin: 0 auto;
+  }
+
+  /* ---------- Header ---------- */
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: #fff;
+    width: 100%;
+  }
+
+  .gnb {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 50px min(160px, 8.3333vw);
+  }
+
+  .logo {
+    font-family: "Paperlogy", "Pretendard", sans-serif;
+    font-weight: 800;
+    font-size: 40px;
+    letter-spacing: -1.2px;
+    color: var(--blue-primary);
+    white-space: nowrap;
+    cursor: default;
+  }
+
+  /* ---------- Episode chip nav ---------- */
+  nav.ep-menu {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 16px;
+    /* inactive chip's 2px border pushes its auto height to 60px (8+8
+       padding + 40 icon + 2+2 border) — 68px - 12px bottom padding only
+       left 56px of room, clipping ~4px off the chip's top/bottom */
+    height: 72px;
+    padding: 0 min(160px, 8.3333vw) 12px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+  }
+  nav.ep-menu::-webkit-scrollbar { display: none; }
+
+  .chip-wrap { flex-shrink: 0; }
+
+  .chip-btn {
+    appearance: none;
+    border: none;
+    background: transparent;
+    font-family: inherit;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+    display: block;
+  }
+
+  .chip-btn:focus-visible {
+    outline: 2px solid var(--blue-accent);
+    outline-offset: 2px;
+    border-radius: 16px;
+  }
+
+  .chip-icon {
+    display: block;
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: transparent;
+  }
+  .chip-icon img { display: block; width: 100%; height: 100%; object-fit: cover; }
+
+  /* inactive: bordered white pill, icon + gray label */
+  .chip-inactive {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 20px 8px 8px;
+    border: 2px solid var(--chip-border);
+    border-radius: 16px;
+    background: #fff;
+  }
+
+  .chip-label-inactive {
+    font-weight: 700;
+    font-size: 24px;
+    letter-spacing: -0.72px;
+    color: var(--chip-gray);
+    white-space: nowrap;
+    transition: color 0.2s ease;
+  }
+
+  .chip-btn:hover .chip-inactive { border-color: var(--blue-accent); }
+  .chip-btn:hover .chip-label-inactive { color: var(--blue-accent); }
+
+  /* active: expanded light-blue box, icon + EP label + inline hashtags,
+     with a scroll-scrubbed blue fill sweeping left -> right underneath */
+  .chip-active-box {
+    display: none;
+    position: relative;
+    overflow: hidden;
+    align-items: center;
+    gap: 32px;
+    padding: 8px 32px 8px 8px;
+    border-radius: 16px;
+    background: var(--blue-light);
+  }
+
+  .chip-wrap.active .chip-inactive { display: none; }
+  .chip-wrap.active .chip-active-box { display: flex; }
+
+  .chip-active-content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    gap: 32px;
+  }
+
+  .chip-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .chip-ep-label {
+    font-weight: 700;
+    font-size: 24px;
+    letter-spacing: -0.72px;
+    color: var(--blue-accent);
+    white-space: nowrap;
+    text-transform: uppercase;
+  }
+
+  .chip-tags {
+    display: flex;
+    gap: 21px;
+    font-weight: 500;
+    font-size: 16px;
+    letter-spacing: -0.48px;
+    color: var(--blue-accent);
+    white-space: nowrap;
+    text-transform: uppercase;
+  }
+
+  .chip-tags a {
+    font-family: inherit;
+    color: inherit;
+    text-decoration: none;
+  }
+  .chip-tags a:hover { text-decoration: underline; }
+
+  .chip-fill {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    padding: 8px 32px 8px 8px;
+    background: var(--blue-accent);
+    clip-path: inset(0 100% 0 0);
+    will-change: clip-path;
+    pointer-events: none;
+  }
+
+  .chip-fill .chip-ep-label,
+  .chip-fill .chip-tags { color: #fff; }
+
+  /* ---------- Content ---------- */
+  main {
+    width: 100%;
+    line-height: 0;
+  }
+
+  .content-image {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .content-blank {
+    display: block;
+    width: 100%;
+    min-height: 800px;
+    background: #fff;
+  }
+
+  /* 복지혜택 mobile-only responsive frame: fixed-width foreground centered
+     over a background that fills the rest of the viewport and disappears
+     once the viewport narrows to the foreground's own width (375px) */
+  .benefit-frame {
+    display: none;
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+  }
+
+  .benefit-frame.active { display: block; }
+
+  .benefit-bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center top;
+    z-index: 0;
+  }
+
+  .benefit-fg {
+    position: relative;
+    z-index: 1;
+    display: block;
+    width: 375px;
+    height: auto;
+    margin: 0 auto;
+  }
+
+  @media (max-width: 768px) {
+    header { box-shadow: 0px 4px 5px rgba(0, 0, 0, 0.15); }
+
+    .gnb { padding: 40px 20px 24px 24px; }
+    .logo { font-size: 25px; letter-spacing: -0.76px; }
+
+    nav.ep-menu {
+      gap: 8px;
+      height: 48px;
+      padding: 0 20px 8px 24px;
+    }
+
+    .chip-icon { width: 24px; height: 24px; }
+    .chip-inactive { gap: 8px; padding: 6px 16px 6px 6px; border-radius: 12px; border-width: 1px; }
+    .chip-label-inactive { font-size: 13px; letter-spacing: -0.39px; }
+
+    .chip-active-box { gap: 12px; padding: 6px 16px 6px 6px; border-radius: 12px; }
+    .chip-fill { gap: 12px; padding: 6px 16px 6px 6px; border-radius: 12px; }
+    .chip-title { gap: 8px; }
+    .chip-ep-label { font-size: 13px; letter-spacing: -0.39px; }
+    .chip-tags { gap: 12px; font-size: 13px; letter-spacing: -0.39px; }
+  }
+</style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <div class="gnb">
+        <span class="logo">The-K 더 캐보자</span>
+      </div>
+      <nav class="ep-menu" id="navMenu">
+        <div class="chip-wrap active" data-key="firstpay" data-content="assets/content-firstpay-v2.jpg" data-content-mobile="assets/content-firstpay-mobile.jpg">
+          <button class="chip-btn" type="button">
+            <span class="chip-inactive">
+              <span class="chip-icon"><img src="assets/icon-ep01.png" alt="" /></span>
+              <span class="chip-label-inactive">장기저축급여</span>
+            </span>
+            <span class="chip-active-box">
+              <span class="chip-active-content">
+                <span class="chip-title">
+                  <span class="chip-icon"><img src="assets/icon-ep01.png" alt="" /></span>
+                  <span class="chip-ep-label">EP.01 장기저축급여</span>
+                </span>
+                <span class="chip-tags">
+                  <a href="#">#첫월급</a>
+                  <a href="#">#월급관리</a>
+                  <a href="#">#평생월급</a>
+                  <a href="#">#복리마법</a>
+                </span>
+              </span>
+              <span class="chip-fill" aria-hidden="true">
+                <span class="chip-active-content">
+                  <span class="chip-title">
+                    <span class="chip-icon"><img src="assets/icon-ep01.png" alt="" /></span>
+                    <span class="chip-ep-label">EP.01 장기저축급여</span>
+                  </span>
+                  <span class="chip-tags">
+                    <a href="#" tabindex="-1">#첫월급</a>
+                    <a href="#" tabindex="-1">#월급관리</a>
+                    <a href="#" tabindex="-1">#평생월급</a>
+                    <a href="#" tabindex="-1">#복리마법</a>
+                  </span>
+                </span>
+              </span>
+            </span>
+          </button>
+        </div>
+
+        <div class="chip-wrap" data-key="retire" data-content="assets/content-retire-v2.jpg" data-content-mobile="assets/content-retire-mobile.jpg">
+          <button class="chip-btn" type="button">
+            <span class="chip-inactive">
+              <span class="chip-icon"><img src="assets/icon-ep02.png" alt="" /></span>
+              <span class="chip-label-inactive">분할급여금</span>
+            </span>
+            <span class="chip-active-box">
+              <span class="chip-active-content">
+                <span class="chip-title">
+                  <span class="chip-icon"><img src="assets/icon-ep02.png" alt="" /></span>
+                  <span class="chip-ep-label">EP.02 분할급여금</span>
+                </span>
+                <span class="chip-tags">
+                  <a href="#">#퇴직후생활비</a>
+                  <a href="#">#퇴직급여금수령방법</a>
+                  <a href="#">#장기저축급여_퇴직급여금</a>
+                  <a href="#">#일시금vs분할</a>
+                </span>
+              </span>
+              <span class="chip-fill" aria-hidden="true">
+                <span class="chip-active-content">
+                  <span class="chip-title">
+                    <span class="chip-icon"><img src="assets/icon-ep02.png" alt="" /></span>
+                    <span class="chip-ep-label">EP.02 분할급여금</span>
+                  </span>
+                  <span class="chip-tags">
+                    <a href="#" tabindex="-1">#퇴직후생활비</a>
+                    <a href="#" tabindex="-1">#퇴직급여금수령방법</a>
+                    <a href="#" tabindex="-1">#장기저축급여_퇴직급여금</a>
+                    <a href="#" tabindex="-1">#일시금vs분할</a>
+                  </span>
+                </span>
+              </span>
+            </span>
+          </button>
+        </div>
+
+        <div class="chip-wrap" data-key="deposit" data-content="assets/content-deposit-v2.jpg" data-content-mobile="assets/content-deposit-mobile.jpg">
+          <button class="chip-btn" type="button">
+            <span class="chip-inactive">
+              <span class="chip-icon"><img src="assets/icon-ep03.png" alt="" /></span>
+              <span class="chip-label-inactive">증좌</span>
+            </span>
+            <span class="chip-active-box">
+              <span class="chip-active-content">
+                <span class="chip-title">
+                  <span class="chip-icon"><img src="assets/icon-ep03.png" alt="" /></span>
+                  <span class="chip-ep-label">EP.03 증좌</span>
+                </span>
+                <span class="chip-tags">
+                  <a href="#">#장기저축급여</a>
+                  <a href="#">#급여율5.0%</a>
+                  <a href="#">#급여율인상</a>
+                  <a href="#">#증좌신청</a>
+                </span>
+              </span>
+              <span class="chip-fill" aria-hidden="true">
+                <span class="chip-active-content">
+                  <span class="chip-title">
+                    <span class="chip-icon"><img src="assets/icon-ep03.png" alt="" /></span>
+                    <span class="chip-ep-label">EP.03 증좌</span>
+                  </span>
+                  <span class="chip-tags">
+                    <a href="#" tabindex="-1">#장기저축급여</a>
+                    <a href="#" tabindex="-1">#급여율5.0%</a>
+                    <a href="#" tabindex="-1">#급여율인상</a>
+                    <a href="#" tabindex="-1">#증좌신청</a>
+                  </span>
+                </span>
+              </span>
+            </span>
+          </button>
+        </div>
+
+        <div class="chip-wrap" data-key="benefit" data-content="assets/content.jpg">
+          <button class="chip-btn" type="button">
+            <span class="chip-inactive">
+              <span class="chip-icon"><img src="assets/icon-ep04.png" alt="" /></span>
+              <span class="chip-label-inactive">복지혜택</span>
+            </span>
+            <span class="chip-active-box">
+              <span class="chip-active-content">
+                <span class="chip-title">
+                  <span class="chip-icon"><img src="assets/icon-ep04.png" alt="" /></span>
+                  <span class="chip-ep-label">EP.04 복지혜택</span>
+                </span>
+                <span class="chip-tags">
+                  <a href="#">#복지혜택</a>
+                  <a href="#">#이벤트혜택</a>
+                  <a href="#">#회원복지</a>
+                  <a href="#">#복지알림</a>
+                </span>
+              </span>
+              <span class="chip-fill" aria-hidden="true">
+                <span class="chip-active-content">
+                  <span class="chip-title">
+                    <span class="chip-icon"><img src="assets/icon-ep04.png" alt="" /></span>
+                    <span class="chip-ep-label">EP.04 복지혜택</span>
+                  </span>
+                  <span class="chip-tags">
+                    <a href="#" tabindex="-1">#복지혜택</a>
+                    <a href="#" tabindex="-1">#이벤트혜택</a>
+                    <a href="#" tabindex="-1">#회원복지</a>
+                    <a href="#" tabindex="-1">#복지알림</a>
+                  </span>
+                </span>
+              </span>
+            </span>
+          </button>
+        </div>
+
+        <div class="chip-wrap" data-key="future" data-content="">
+          <button class="chip-btn" type="button">
+            <span class="chip-inactive">
+              <span class="chip-icon"><img src="assets/icon-ep05.png" alt="" /></span>
+              <span class="chip-label-inactive">회원혜택</span>
+            </span>
+            <span class="chip-active-box">
+              <span class="chip-active-content">
+                <span class="chip-title">
+                  <span class="chip-icon"><img src="assets/icon-ep05.png" alt="" /></span>
+                  <span class="chip-ep-label">EP.05 회원혜택</span>
+                </span>
+                <span class="chip-tags">
+                  <a href="#">#미래자산</a>
+                  <a href="#">#자산포트폴리오</a>
+                  <a href="#">#맞춤형금융설계</a>
+                  <a href="#">#스마트재테크</a>
+                </span>
+              </span>
+              <span class="chip-fill" aria-hidden="true">
+                <span class="chip-active-content">
+                  <span class="chip-title">
+                    <span class="chip-icon"><img src="assets/icon-ep05.png" alt="" /></span>
+                    <span class="chip-ep-label">EP.05 회원혜택</span>
+                  </span>
+                  <span class="chip-tags">
+                    <a href="#" tabindex="-1">#미래자산</a>
+                    <a href="#" tabindex="-1">#자산포트폴리오</a>
+                    <a href="#" tabindex="-1">#맞춤형금융설계</a>
+                    <a href="#" tabindex="-1">#스마트재테크</a>
+                  </span>
+                </span>
+              </span>
+            </span>
+          </button>
+        </div>
+
+        <div class="chip-wrap" data-key="lowtax" data-content="">
+          <button class="chip-btn" type="button">
+            <span class="chip-inactive">
+              <span class="chip-icon"><img src="assets/icon-ep06.png" alt="" /></span>
+              <span class="chip-label-inactive">장기저축급여 2편</span>
+            </span>
+            <span class="chip-active-box">
+              <span class="chip-active-content">
+                <span class="chip-title">
+                  <span class="chip-icon"><img src="assets/icon-ep06.png" alt="" /></span>
+                  <span class="chip-ep-label">EP.06 장기저축급여 2편</span>
+                </span>
+                <span class="chip-tags">
+                  <a href="#">#저율과세혜택</a>
+                  <a href="#">#연복리효과</a>
+                  <a href="#">#교직원전용상품</a>
+                  <a href="#">#스마트재테크</a>
+                </span>
+              </span>
+              <span class="chip-fill" aria-hidden="true">
+                <span class="chip-active-content">
+                  <span class="chip-title">
+                    <span class="chip-icon"><img src="assets/icon-ep06.png" alt="" /></span>
+                    <span class="chip-ep-label">EP.06 장기저축급여 2편</span>
+                  </span>
+                  <span class="chip-tags">
+                    <a href="#" tabindex="-1">#저율과세혜택</a>
+                    <a href="#" tabindex="-1">#연복리효과</a>
+                    <a href="#" tabindex="-1">#교직원전용상품</a>
+                    <a href="#" tabindex="-1">#스마트재테크</a>
+                  </span>
+                </span>
+              </span>
+            </span>
+          </button>
+        </div>
+
+        <div class="chip-wrap" data-key="deduction" data-content="">
+          <button class="chip-btn" type="button">
+            <span class="chip-inactive">
+              <span class="chip-icon"><img src="assets/icon-ep07.png" alt="" /></span>
+              <span class="chip-label-inactive">증좌 2편</span>
+            </span>
+            <span class="chip-active-box">
+              <span class="chip-active-content">
+                <span class="chip-title">
+                  <span class="chip-icon"><img src="assets/icon-ep07.png" alt="" /></span>
+                  <span class="chip-ep-label">EP.07 증좌 2편</span>
+                </span>
+                <span class="chip-tags">
+                  <a href="#">#급여공제저축</a>
+                  <a href="#">#선저축후지출</a>
+                  <a href="#">#쉬운목돈만들기</a>
+                  <a href="#">#부담없는소액저축</a>
+                </span>
+              </span>
+              <span class="chip-fill" aria-hidden="true">
+                <span class="chip-active-content">
+                  <span class="chip-title">
+                    <span class="chip-icon"><img src="assets/icon-ep07.png" alt="" /></span>
+                    <span class="chip-ep-label">EP.07 증좌 2편</span>
+                  </span>
+                  <span class="chip-tags">
+                    <a href="#" tabindex="-1">#급여공제저축</a>
+                    <a href="#" tabindex="-1">#선저축후지출</a>
+                    <a href="#" tabindex="-1">#쉬운목돈만들기</a>
+                    <a href="#" tabindex="-1">#부담없는소액저축</a>
+                  </span>
+                </span>
+              </span>
+            </span>
+          </button>
+        </div>
+
+        <div class="chip-wrap" data-key="yearend" data-content="">
+          <button class="chip-btn" type="button">
+            <span class="chip-inactive">
+              <span class="chip-icon"><img src="assets/icon-ep08.png" alt="" /></span>
+              <span class="chip-label-inactive">분할급여금 2편</span>
+            </span>
+            <span class="chip-active-box">
+              <span class="chip-active-content">
+                <span class="chip-title">
+                  <span class="chip-icon"><img src="assets/icon-ep08.png" alt="" /></span>
+                  <span class="chip-ep-label">EP.08 분할급여금 2편</span>
+                </span>
+                <span class="chip-tags">
+                  <a href="#">#연말정산대비</a>
+                  <a href="#">#스마트한절세</a>
+                  <a href="#">#퇴직급여금조회</a>
+                  <a href="#">#내년재무목표</a>
+                </span>
+              </span>
+              <span class="chip-fill" aria-hidden="true">
+                <span class="chip-active-content">
+                  <span class="chip-title">
+                    <span class="chip-icon"><img src="assets/icon-ep08.png" alt="" /></span>
+                    <span class="chip-ep-label">EP.08 분할급여금 2편</span>
+                  </span>
+                  <span class="chip-tags">
+                    <a href="#" tabindex="-1">#연말정산대비</a>
+                    <a href="#" tabindex="-1">#스마트한절세</a>
+                    <a href="#" tabindex="-1">#퇴직급여금조회</a>
+                    <a href="#" tabindex="-1">#내년재무목표</a>
+                  </span>
+                </span>
+              </span>
+            </span>
+          </button>
+        </div>
+      </nav>
+    </header>
+
+    <main>
+      <img class="content-image" id="contentImage" src="assets/content-firstpay-v2.jpg" alt="The-K 더 캐보자 콘텐츠" />
+
+      <!-- 복지혜택 mobile only: fixed 375px-wide content over a full-width
+           background that shrinks with the viewport and is fully hidden
+           behind the content once the viewport reaches 375px -->
+      <div class="benefit-frame" id="benefitFrame">
+        <img class="benefit-bg" src="assets/benefit-bg-mobile.jpg" alt="" aria-hidden="true" />
+        <img class="benefit-fg" src="assets/benefit-fg-mobile.jpg" alt="The-K 더 캐보자 복지혜택" />
+      </div>
+    </main>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/ScrollTrigger.min.js"></script>
+  <script>
+    const chipWraps = document.querySelectorAll('.chip-wrap');
+    const contentImage = document.getElementById('contentImage');
+    const benefitFrame = document.getElementById('benefitFrame');
+    // content images (firstpay/retire/deposit) keep swapping at 768px
+    const contentMobileQuery = window.matchMedia('(max-width: 768px)');
+    const navMenu = document.getElementById('navMenu');
+
+    function applyContent(wrap) {
+      // 복지혜택 always gets the fixed-375px-foreground + shrinking-background
+      // treatment instead of the plain swapped <img>, at every width
+      const useBenefitFrame = wrap.dataset.key === 'benefit';
+      benefitFrame.classList.toggle('active', useBenefitFrame);
+
+      if (useBenefitFrame) {
+        contentImage.style.display = 'none';
+        const existingBlank = document.getElementById('contentBlank');
+        if (existingBlank) existingBlank.style.display = 'none';
+        return;
+      }
+
+      const src = (contentMobileQuery.matches && wrap.dataset.contentMobile)
+        ? wrap.dataset.contentMobile
+        : wrap.dataset.content;
+
+      if (src) {
+        contentImage.src = src;
+        contentImage.style.display = '';
+      } else {
+        contentImage.style.display = 'none';
+        let blank = document.getElementById('contentBlank');
+        if (!blank) {
+          blank = document.createElement('div');
+          blank.id = 'contentBlank';
+          blank.className = 'content-blank';
+          contentImage.insertAdjacentElement('afterend', blank);
+        }
+        blank.style.display = 'block';
+      }
+
+      const existingBlank = document.getElementById('contentBlank');
+      if (src && existingBlank) existingBlank.style.display = 'none';
+    }
+
+    // whichever chip becomes active always lands at the nav's own left
+    // inset — 160 on desktop, 24 on mobile (matches nav.ep-menu's own
+    // left padding at each breakpoint) — so it's always in the same spot,
+    // not just scrolled into view.
+    function activeChipX() {
+      return contentMobileQuery.matches ? 24 : 160;
+    }
+
+    function scrollActiveIntoView(wrap, smooth) {
+      const navRect = navMenu.getBoundingClientRect();
+      const wrapRect = wrap.getBoundingClientRect();
+      const delta = wrapRect.left - navRect.left;
+      const target = Math.max(0, navMenu.scrollLeft + delta - activeChipX());
+      navMenu.scrollTo({ left: target, behavior: smooth ? 'smooth' : 'auto' });
+    }
+
+    function setActive(wrap, opts) {
+      chipWraps.forEach((w) => w.classList.remove('active'));
+      wrap.classList.add('active');
+      applyContent(wrap);
+      scrollActiveIntoView(wrap, !(opts && opts.instant));
+    }
+
+    chipWraps.forEach((wrap) => {
+      wrap.querySelector('.chip-btn').addEventListener('click', () => setActive(wrap));
+    });
+
+    const initialActive = document.querySelector('.chip-wrap.active');
+    if (initialActive) {
+      applyContent(initialActive);
+      scrollActiveIntoView(initialActive, false);
+      if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(() => scrollActiveIntoView(initialActive, false));
+      }
+      window.addEventListener('load', () => scrollActiveIntoView(initialActive, false));
+    }
+
+    contentMobileQuery.addEventListener('change', () => {
+      const activeWrap = document.querySelector('.chip-wrap.active');
+      if (activeWrap) applyContent(activeWrap);
+    });
+
+    let resizeFrame = null;
+    window.addEventListener('resize', () => {
+      if (resizeFrame) return;
+      resizeFrame = requestAnimationFrame(() => {
+        resizeFrame = null;
+        const activeWrap = document.querySelector('.chip-wrap.active');
+        if (activeWrap) scrollActiveIntoView(activeWrap, false);
+      });
+    });
+
+    // GSAP ScrollTrigger: whichever episode chip is active, its box fills
+    // left -> right mapped to the entire page scroll range.
+    gsap.registerPlugin(ScrollTrigger);
+
+    gsap.to('.chip-fill', {
+      clipPath: 'inset(0 0% 0 0)',
+      ease: 'none',
+      scrollTrigger: {
+        trigger: document.body,
+        start: 'top top',
+        end: 'max',
+        scrub: true,
+      },
+    });
+
+    // mobile only: as the page scrolls, the header's chip row scrolls
+    // left along with it, mapping page-scroll progress (0 -> 1) onto the
+    // nav's own horizontal scroll range — capped so the active chip never
+    // scrolls fully out of view; a sliver of its trailing edge always stays
+    // on screen.
+    const ACTIVE_CHIP_TAIL = 32;
+
+    ScrollTrigger.create({
+      trigger: document.body,
+      start: 'top top',
+      end: 'max',
+      scrub: true,
+      onUpdate: (self) => {
+        if (!contentMobileQuery.matches) return;
+        const fullMax = navMenu.scrollWidth - navMenu.clientWidth;
+        if (fullMax <= 0) return;
+
+        let cap = fullMax;
+        const activeWrap = document.querySelector('.chip-wrap.active');
+        if (activeWrap) {
+          const navRect = navMenu.getBoundingClientRect();
+          const wrapRect = activeWrap.getBoundingClientRect();
+          const activeContentRight = navMenu.scrollLeft + (wrapRect.right - navRect.left);
+          cap = Math.min(fullMax, Math.max(0, activeContentRight - ACTIVE_CHIP_TAIL));
+        }
+
+        navMenu.scrollLeft = cap * self.progress;
+      },
+    });
+  </script>
+</body>
+</html>
