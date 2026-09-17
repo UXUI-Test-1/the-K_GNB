@@ -599,6 +599,13 @@
     const benefitFrame = document.getElementById('benefitFrame');
     // content images (firstpay/retire/deposit) keep swapping at 768px
     const contentMobileQuery = window.matchMedia('(max-width: 768px)');
+
+    // each tab's content image is a different height, which changes how
+    // tall the page actually is — recompute the scroll range once the
+    // newly-swapped image has actually loaded and laid out at its real size.
+    contentImage.addEventListener('load', () => {
+      if (window.ScrollTrigger) ScrollTrigger.refresh();
+    });
     const navMenu = document.getElementById('navMenu');
 
     function applyContent(wrap) {
@@ -642,7 +649,7 @@
     // left padding at each breakpoint) — so it's always in the same spot,
     // not just scrolled into view.
     function activeChipX() {
-      return contentMobileQuery.matches ? 24 : 160;
+      return contentMobileQuery.matches ? 28 : 160;
     }
 
     function scrollActiveIntoView(wrap, smooth) {
@@ -658,6 +665,14 @@
       wrap.classList.add('active');
       applyContent(wrap);
       scrollActiveIntoView(wrap, !(opts && opts.instant));
+
+      // switching tabs swaps in a whole new (differently-tall) content
+      // image, so the old vertical scroll position no longer means
+      // anything for it — jump back to the top and recompute the scroll
+      // range immediately, so the fill/scroll animation ScrollTrigger
+      // isn't left using the previous tab's page height as "max".
+      window.scrollTo(0, 0);
+      if (window.ScrollTrigger) ScrollTrigger.refresh();
     }
 
     chipWraps.forEach((wrap) => {
@@ -693,23 +708,13 @@
     // left -> right mapped to the entire page scroll range.
     gsap.registerPlugin(ScrollTrigger);
 
-    gsap.to('.chip-fill', {
-      clipPath: 'inset(0 0% 0 0)',
-      ease: 'none',
-      scrollTrigger: {
-        trigger: document.body,
-        start: 'top top',
-        end: 'max',
-        scrub: true,
-      },
-    });
-
-    // mobile only: as the page scrolls, the header's chip row scrolls
-    // left along with it, mapping page-scroll progress (0 -> 1) onto the
-    // nav's own horizontal scroll range — capped so the active chip never
-    // scrolls fully out of view; a sliver of its trailing edge always stays
-    // on screen.
+    // Single ScrollTrigger drives both the chip's color fill and (on mobile)
+    // the nav's horizontal scroll off the exact same `self.progress` value
+    // each frame, so the two stay perfectly locked to one another instead
+    // of drifting as two independently-refreshed triggers.
+    const ACTIVE_CHIP_START_X = 28;
     const ACTIVE_CHIP_TAIL = 32;
+    const chipFills = document.querySelectorAll('.chip-fill');
 
     ScrollTrigger.create({
       trigger: document.body,
@@ -717,20 +722,31 @@
       end: 'max',
       scrub: true,
       onUpdate: (self) => {
+        const p = self.progress;
+
+        chipFills.forEach((el) => {
+          el.style.clipPath = `inset(0 ${(1 - p) * 100}% 0 0)`;
+        });
+
         if (!contentMobileQuery.matches) return;
         const fullMax = navMenu.scrollWidth - navMenu.clientWidth;
         if (fullMax <= 0) return;
 
-        let cap = fullMax;
         const activeWrap = document.querySelector('.chip-wrap.active');
-        if (activeWrap) {
-          const navRect = navMenu.getBoundingClientRect();
-          const wrapRect = activeWrap.getBoundingClientRect();
-          const activeContentRight = navMenu.scrollLeft + (wrapRect.right - navRect.left);
-          cap = Math.min(fullMax, Math.max(0, activeContentRight - ACTIVE_CHIP_TAIL));
-        }
+        if (!activeWrap) return;
 
-        navMenu.scrollLeft = cap * self.progress;
+        // content-space position of the active chip's edges — stable
+        // regardless of the current scrollLeft, since it adds that same
+        // scrollLeft back on to the viewport-relative measurement.
+        const navRect = navMenu.getBoundingClientRect();
+        const wrapRect = activeWrap.getBoundingClientRect();
+        const contentLeft = navMenu.scrollLeft + (wrapRect.left - navRect.left);
+        const contentRight = contentLeft + wrapRect.width;
+
+        const base = Math.max(0, contentLeft - ACTIVE_CHIP_START_X);
+        const cap = Math.min(fullMax, Math.max(base, contentRight - ACTIVE_CHIP_TAIL));
+
+        navMenu.scrollLeft = base + (cap - base) * p;
       },
     });
   </script>
