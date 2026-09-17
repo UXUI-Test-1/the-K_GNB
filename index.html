@@ -233,10 +233,20 @@
   }
 
   .content-blank {
-    display: block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     width: 100%;
     min-height: 800px;
     background: #fff;
+  }
+
+  .content-blank span {
+    font-family: "Pretendard", sans-serif;
+    font-weight: 700;
+    font-size: 40px;
+    color: var(--blue-primary);
+    opacity: 0.4;
   }
 
   /* 복지혜택 mobile-only responsive frame: fixed-width foreground centered
@@ -424,7 +434,7 @@
           </div>
         </div>
 
-        <div class="tab-wrap" data-key="future" data-content="">
+        <div class="tab-wrap" data-key="future" data-content="" data-blank-color="#E8F5E9">
           <button class="tab-btn" type="button">
             <span class="tab-plain">#미래자산</span>
             <span class="tab-pill">
@@ -445,7 +455,7 @@
           </div>
         </div>
 
-        <div class="tab-wrap" data-key="lowtax" data-content="">
+        <div class="tab-wrap" data-key="lowtax" data-content="" data-blank-color="#FFF9E6">
           <button class="tab-btn" type="button">
             <span class="tab-plain">#저율과세혜택</span>
             <span class="tab-pill">
@@ -466,7 +476,7 @@
           </div>
         </div>
 
-        <div class="tab-wrap" data-key="deduction" data-content="">
+        <div class="tab-wrap" data-key="deduction" data-content="" data-blank-color="#F3E8FF">
           <button class="tab-btn" type="button">
             <span class="tab-plain">#급여공제저축</span>
             <span class="tab-pill">
@@ -487,7 +497,7 @@
           </div>
         </div>
 
-        <div class="tab-wrap" data-key="yearend" data-content="">
+        <div class="tab-wrap" data-key="yearend" data-content="" data-blank-color="#FFF0E0">
           <button class="tab-btn" type="button">
             <span class="tab-plain">#연말정산대비</span>
             <span class="tab-pill">
@@ -574,9 +584,11 @@
           blank = document.createElement('div');
           blank.id = 'contentBlank';
           blank.className = 'content-blank';
+          blank.innerHTML = '<span>콘텐츠 영역</span>';
           contentImage.insertAdjacentElement('afterend', blank);
         }
-        blank.style.display = 'block';
+        blank.style.background = wrap.dataset.blankColor || '#fff';
+        blank.style.display = 'flex';
       }
 
       const existingBlank = document.getElementById('contentBlank');

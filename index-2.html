@@ -212,10 +212,16 @@
   }
 
   .content-blank {
-    display: block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     width: 100%;
     min-height: 800px;
     background: #fff;
+    font-size: 40pt;
+    font-weight: 700;
+    color: var(--blue-primary);
+    line-height: normal;
   }
 
   /* 복지혜택 mobile-only responsive frame: fixed-width foreground centered
@@ -608,6 +614,15 @@
     });
     const navMenu = document.getElementById('navMenu');
 
+    // the 4 tabs with no real content yet each get their own light,
+    // distinct placeholder background instead of a plain blank white block.
+    const BLANK_COLORS = {
+      future: '#f1e9ff',
+      lowtax: '#e4f6ea',
+      deduction: '#fff6dd',
+      yearend: '#ffe7ee',
+    };
+
     function applyContent(wrap) {
       // 복지혜택 always gets the fixed-375px-foreground + shrinking-background
       // treatment instead of the plain swapped <img>, at every width
@@ -635,9 +650,11 @@
           blank = document.createElement('div');
           blank.id = 'contentBlank';
           blank.className = 'content-blank';
+          blank.textContent = '콘텐츠 영역';
           contentImage.insertAdjacentElement('afterend', blank);
         }
-        blank.style.display = 'block';
+        blank.style.background = BLANK_COLORS[wrap.dataset.key] || '#f2f2f2';
+        blank.style.display = 'flex';
       }
 
       const existingBlank = document.getElementById('contentBlank');
