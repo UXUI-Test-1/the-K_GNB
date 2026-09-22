@@ -255,6 +255,84 @@
     margin: 0 auto;
   }
 
+  /* ---------- Floating "watch video" widget ---------- */
+  /* fixed to the viewport (not just sticky-with-header) so it stays
+     visible no matter how far the page is scrolled; positioned to match
+     the same right inset the GNB itself uses */
+  .video-fab {
+    display: none;
+    position: fixed;
+    top: 19px;
+    right: min(160px, 8.3333vw);
+    z-index: 200;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    cursor: pointer;
+    border: none;
+    background: none;
+    padding: 0;
+  }
+  .video-fab.active { display: flex; }
+
+  .video-fab-circle {
+    display: block;
+    position: relative;
+    width: 96px;
+    height: 96px;
+    border-radius: 999px;
+    background: #0f68ee;
+    overflow: hidden;
+  }
+  /* per-tab position/size is set inline via JS (data-fab-img-style),
+     matching each image's own custom crop in Figma — they're not all the
+     same size/offset within the 96px circle */
+  .video-fab-circle img,
+  .video-fab-circle video {
+    display: block;
+    object-fit: cover;
+    pointer-events: none;
+  }
+
+  .video-fab-tip {
+    margin-top: -24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    filter: drop-shadow(0px 6px 6.825px rgba(0, 0, 0, 0.22));
+  }
+  .video-fab-tail {
+    display: block;
+    width: 91px;
+    height: 22px;
+    margin-bottom: -9px;
+    transform: rotate(180deg);
+    position: relative;
+    z-index: 1;
+  }
+  .video-fab-pill {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    background: #fff;
+    border-radius: 12px;
+    padding: 6px 12px;
+    white-space: nowrap;
+    font-family: "Pretendard", sans-serif;
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: -0.36px;
+    color: var(--blue-accent);
+    text-transform: uppercase;
+  }
+  .video-fab-play {
+    width: 10px;
+    height: 8px;
+    transform: rotate(90deg);
+    flex: none;
+  }
+
   @media (max-width: 768px) {
     header { box-shadow: 0px 4px 5px rgba(0, 0, 0, 0.15); }
 
@@ -276,6 +354,9 @@
     .chip-title { gap: 8px; }
     .chip-ep-label { font-size: 13px; letter-spacing: -0.39px; }
     .chip-tags { gap: 12px; font-size: 13px; letter-spacing: -0.39px; }
+
+    /* 96px * 0.625 = 60px circle on mobile */
+    .video-fab { top: 12px; right: 16px; transform: scale(0.625); transform-origin: top right; }
   }
 </style>
 </head>
@@ -286,7 +367,7 @@
         <span class="logo">The-K 더 캐보자</span>
       </div>
       <nav class="ep-menu" id="navMenu">
-        <div class="chip-wrap active" data-key="firstpay" data-content="assets/content-firstpay-v2.jpg" data-content-mobile="assets/content-firstpay-mobile.jpg">
+        <div class="chip-wrap active" data-key="firstpay" data-content="assets/content-firstpay-v2.jpg" data-content-mobile="assets/content-firstpay-mobile.jpg" data-fab-bg="#FF5285" data-fab-color="#FF5285" data-fab-type="video" data-fab-media="assets/1편.mp4" data-fab-img-style="width:100%;height:100%;left:0;top:0;">
           <button class="chip-btn" type="button">
             <span class="chip-inactive">
               <span class="chip-icon"><img src="assets/icon-ep01.png" alt="" /></span>
@@ -323,7 +404,7 @@
           </button>
         </div>
 
-        <div class="chip-wrap" data-key="retire" data-content="assets/content-retire-v2.jpg" data-content-mobile="assets/content-retire-mobile.jpg">
+        <div class="chip-wrap" data-key="retire" data-content="assets/content-retire-v2.jpg" data-content-mobile="assets/content-retire-mobile.jpg" data-fab-bg="#0F68EE" data-fab-color="#2853F6" data-fab-type="video" data-fab-media="assets/2편.mp4" data-fab-img-style="width:100%;height:100%;left:0;top:0;">
           <button class="chip-btn" type="button">
             <span class="chip-inactive">
               <span class="chip-icon"><img src="assets/icon-ep02.png" alt="" /></span>
@@ -360,7 +441,7 @@
           </button>
         </div>
 
-        <div class="chip-wrap" data-key="deposit" data-content="assets/content-deposit-v2.jpg" data-content-mobile="assets/content-deposit-mobile.jpg">
+        <div class="chip-wrap" data-key="deposit" data-content="assets/content-deposit-v2.jpg" data-content-mobile="assets/content-deposit-mobile.jpg" data-fab-bg="#8D3BFF" data-fab-color="#8D3BFF" data-fab-type="video" data-fab-media="assets/3편.mp4" data-fab-img-style="width:100%;height:100%;left:0;top:0;">
           <button class="chip-btn" type="button">
             <span class="chip-inactive">
               <span class="chip-icon"><img src="assets/icon-ep03.png" alt="" /></span>
@@ -397,7 +478,7 @@
           </button>
         </div>
 
-        <div class="chip-wrap" data-key="benefit" data-content="assets/content.jpg">
+        <div class="chip-wrap" data-key="benefit" data-content="assets/content.jpg" data-fab-bg="#0F68EE" data-fab-color="#2853F6" data-fab-type="video" data-fab-media="assets/4편.mp4" data-fab-img-style="width:86px;height:86px;left:50%;top:calc(50% + 2px);transform:translate(-50%,-50%);">
           <button class="chip-btn" type="button">
             <span class="chip-inactive">
               <span class="chip-icon"><img src="assets/icon-ep04.png" alt="" /></span>
@@ -584,6 +665,21 @@
       </nav>
     </header>
 
+    <a class="video-fab" id="videoFab" href="#" aria-label="영상 보러가기">
+      <span class="video-fab-circle" id="videoFabCircle"></span>
+      <span class="video-fab-tip">
+        <svg class="video-fab-tail" viewBox="0 0 91 22" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M24.4019 18C25.5566 20 28.4434 20 29.5981 18L34.1447 10.125C35.2994 8.125 33.856 5.625 31.5466 5.625H22.4534C20.144 5.625 18.7006 8.125 19.8553 10.125L24.4019 18Z" fill="white"/>
+        </svg>
+        <span class="video-fab-pill" id="videoFabPill">
+          <svg class="video-fab-play" viewBox="0 0 9.73665 7.72128" xmlns="http://www.w3.org/2000/svg">
+            <path d="M3.28352 0.780011C4.08412 -0.260004 5.65253 -0.260004 6.45314 0.780012L9.31778 4.50129C10.3302 5.81643 9.39265 7.72128 7.73297 7.72128H2.00368C0.344003 7.72128 -0.593522 5.81643 0.418872 4.50129L3.28352 0.780011Z" fill="currentColor"/>
+          </svg>
+          영상 보러가기
+        </span>
+      </span>
+    </a>
+
     <main>
       <img class="content-image" id="contentImage" src="assets/content-firstpay-v2.jpg" alt="The-K 더 캐보자 콘텐츠" />
 
@@ -677,10 +773,44 @@
       navMenu.scrollTo({ left: target, behavior: smooth ? 'smooth' : 'auto' });
     }
 
+    // floating "watch video" widget: swaps circle bg/media/text color per
+    // tab, and hides entirely on tabs that don't define one
+    const videoFab = document.getElementById('videoFab');
+    const videoFabCircle = document.getElementById('videoFabCircle');
+    const videoFabPill = document.getElementById('videoFabPill');
+    function updateVideoFab(wrap) {
+      const media = wrap.dataset.fabMedia;
+      if (!media) {
+        videoFab.classList.remove('active');
+        videoFabCircle.innerHTML = '';
+        return;
+      }
+      videoFab.classList.add('active');
+      videoFabCircle.style.background = wrap.dataset.fabBg || '#0f68ee';
+      videoFabPill.style.color = wrap.dataset.fabColor || '#2853f6';
+      const imgStyle = 'position:absolute;' + (wrap.dataset.fabImgStyle || '');
+      videoFabCircle.innerHTML = wrap.dataset.fabType === 'video'
+        ? '<video src="' + media + '" style="' + imgStyle + '" autoplay muted loop playsinline></video>'
+        : '<img src="' + media + '" alt="" style="' + imgStyle + '" />';
+    }
+
+    // pause the fab's video while the page is scrolled, resume once back
+    // at the top
+    window.addEventListener('scroll', () => {
+      const video = videoFabCircle.querySelector('video');
+      if (!video) return;
+      if (window.scrollY > 10) {
+        video.pause();
+      } else if (video.paused) {
+        video.play().catch(() => {});
+      }
+    }, { passive: true });
+
     function setActive(wrap, opts) {
       chipWraps.forEach((w) => w.classList.remove('active'));
       wrap.classList.add('active');
       applyContent(wrap);
+      updateVideoFab(wrap);
       scrollActiveIntoView(wrap, !(opts && opts.instant));
 
       // switching tabs swaps in a whole new (differently-tall) content
@@ -699,6 +829,7 @@
     const initialActive = document.querySelector('.chip-wrap.active');
     if (initialActive) {
       applyContent(initialActive);
+      updateVideoFab(initialActive);
       scrollActiveIntoView(initialActive, false);
       if (document.fonts && document.fonts.ready) {
         document.fonts.ready.then(() => scrollActiveIntoView(initialActive, false));
