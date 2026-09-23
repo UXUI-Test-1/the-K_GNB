@@ -215,6 +215,13 @@
     margin-top: -12px;
   }
 
+  /* header07/header08 (rightmost tabs): tip hangs to the LEFT of the button
+     instead of the right, so the tail anchors to the box's right edge, not
+     its left — matches Figma's items-end layout for these two tips only */
+  .submenu--flip {
+    align-items: flex-end;
+  }
+
   /* ---------- Mobile tip (shared banner, shown below the header) ---------- */
   .mobile-tip {
     display: none;
@@ -364,6 +371,7 @@
 
     /* 96px * 0.625 = 60px circle on mobile */
     .video-fab { top: 12px; right: 16px; transform: scale(0.625); transform-origin: top right; }
+    .video-fab-tip { display: none; }
 
     .gnb { padding: 40px 20px 24px 24px; }
     .logo { font-size: 25px; letter-spacing: -0.76px; }
@@ -515,12 +523,12 @@
           </div>
         </div>
 
-        <div class="tab-wrap" data-key="future" data-content="" data-blank-color="#E8F5E9">
+        <div class="tab-wrap" data-key="future" data-content="" data-blank-color="#E8F5E9" data-fab-bg="#2E9E44" data-fab-color="#2E9E44" data-fab-type="image" data-fab-media="assets/fab-blank-v2.png" data-fab-img-style="width:64px;height:64px;left:50%;top:50%;transform:translate(-50%,-50%);">
           <button class="tab-btn" type="button">
-            <span class="tab-plain">#미래자산</span>
+            <span class="tab-plain">#회원혜택</span>
             <span class="tab-pill">
-              <span class="pill-label pill-label--base">#미래자산</span>
-              <span class="pill-fill" aria-hidden="true"><span class="pill-label">#미래자산</span></span>
+              <span class="pill-label pill-label--base">#회원혜택</span>
+              <span class="pill-fill" aria-hidden="true"><span class="pill-label">#회원혜택</span></span>
             </span>
           </button>
           <div class="submenu">
@@ -536,12 +544,12 @@
           </div>
         </div>
 
-        <div class="tab-wrap" data-key="lowtax" data-content="" data-blank-color="#FFF9E6">
+        <div class="tab-wrap" data-key="lowtax" data-content="" data-blank-color="#FFF9E6" data-fab-bg="#E6A700" data-fab-color="#E6A700" data-fab-type="image" data-fab-media="assets/fab-blank-v2.png" data-fab-img-style="width:64px;height:64px;left:50%;top:50%;transform:translate(-50%,-50%);">
           <button class="tab-btn" type="button">
-            <span class="tab-plain">#저율과세혜택</span>
+            <span class="tab-plain">#장기저축급여 2편</span>
             <span class="tab-pill">
-              <span class="pill-label pill-label--base">#저율과세혜택</span>
-              <span class="pill-fill" aria-hidden="true"><span class="pill-label">#저율과세혜택</span></span>
+              <span class="pill-label pill-label--base">#장기저축급여 2편</span>
+              <span class="pill-fill" aria-hidden="true"><span class="pill-label">#장기저축급여 2편</span></span>
             </span>
           </button>
           <div class="submenu">
@@ -557,15 +565,15 @@
           </div>
         </div>
 
-        <div class="tab-wrap" data-key="deduction" data-content="" data-blank-color="#F3E8FF">
+        <div class="tab-wrap" data-key="deduction" data-content="" data-blank-color="#F3E8FF" data-fab-bg="#8D3BFF" data-fab-color="#8D3BFF" data-fab-type="image" data-fab-media="assets/fab-blank-v2.png" data-fab-img-style="width:64px;height:64px;left:50%;top:50%;transform:translate(-50%,-50%);">
           <button class="tab-btn" type="button">
-            <span class="tab-plain">#급여공제저축</span>
+            <span class="tab-plain">#증좌 2편</span>
             <span class="tab-pill">
-              <span class="pill-label pill-label--base">#급여공제저축</span>
-              <span class="pill-fill" aria-hidden="true"><span class="pill-label">#급여공제저축</span></span>
+              <span class="pill-label pill-label--base">#증좌 2편</span>
+              <span class="pill-fill" aria-hidden="true"><span class="pill-label">#증좌 2편</span></span>
             </span>
           </button>
-          <div class="submenu">
+          <div class="submenu submenu--flip">
             <div class="submenu-box">
               <a href="#">#급여공제저축</a>
               <a href="#">#선저축후지출</a>
@@ -573,20 +581,20 @@
               <a href="#">#부담없는소액저축</a>
             </div>
             <svg class="submenu-arrow" viewBox="0 0 348 30" preserveAspectRatio="xMidYMin meet" xmlns="http://www.w3.org/2000/svg">
-              <path d="M32.5359 24C34.0755 26.6667 37.9245 26.6667 39.4641 24L45.5263 13.5C47.0659 10.8333 45.1414 7.5 42.0622 7.5H29.9378C26.8586 7.5 24.9341 10.8333 26.4737 13.5L32.5359 24Z" fill="white"/>
+              <path d="M315.4641 24C313.9245 26.6667 310.0755 26.6667 308.5359 24L302.4737 13.5C300.9341 10.8333 302.8586 7.5 305.9378 7.5H318.0622C321.1414 7.5 323.0659 10.8333 321.5263 13.5L315.4641 24Z" fill="white"/>
             </svg>
           </div>
         </div>
 
-        <div class="tab-wrap" data-key="yearend" data-content="" data-blank-color="#FFF0E0">
+        <div class="tab-wrap" data-key="yearend" data-content="" data-blank-color="#FFF0E0" data-fab-bg="#FF7A00" data-fab-color="#FF7A00" data-fab-type="image" data-fab-media="assets/fab-blank-v2.png" data-fab-img-style="width:64px;height:64px;left:50%;top:50%;transform:translate(-50%,-50%);">
           <button class="tab-btn" type="button">
-            <span class="tab-plain">#연말정산대비</span>
+            <span class="tab-plain">#분할급여금 2편</span>
             <span class="tab-pill">
-              <span class="pill-label pill-label--base">#연말정산대비</span>
-              <span class="pill-fill" aria-hidden="true"><span class="pill-label">#연말정산대비</span></span>
+              <span class="pill-label pill-label--base">#분할급여금 2편</span>
+              <span class="pill-fill" aria-hidden="true"><span class="pill-label">#분할급여금 2편</span></span>
             </span>
           </button>
-          <div class="submenu">
+          <div class="submenu submenu--flip">
             <div class="submenu-box">
               <a href="#">#연말정산대비</a>
               <a href="#">#스마트한절세</a>
@@ -594,7 +602,7 @@
               <a href="#">#내년재무목표</a>
             </div>
             <svg class="submenu-arrow" viewBox="0 0 348 30" preserveAspectRatio="xMidYMin meet" xmlns="http://www.w3.org/2000/svg">
-              <path d="M32.5359 24C34.0755 26.6667 37.9245 26.6667 39.4641 24L45.5263 13.5C47.0659 10.8333 45.1414 7.5 42.0622 7.5H29.9378C26.8586 7.5 24.9341 10.8333 26.4737 13.5L32.5359 24Z" fill="white"/>
+              <path d="M315.4641 24C313.9245 26.6667 310.0755 26.6667 308.5359 24L302.4737 13.5C300.9341 10.8333 302.8586 7.5 305.9378 7.5H318.0622C321.1414 7.5 323.0659 10.8333 321.5263 13.5L315.4641 24Z" fill="white"/>
             </svg>
           </div>
         </div>
@@ -727,9 +735,32 @@
       const submenu = wrap.querySelector('.submenu');
       if (!submenu) return;
       const btnRect = wrap.querySelector('.tab-pill').getBoundingClientRect();
-      submenu.style.left = btnRect.left + 'px';
+      const flipped = submenu.classList.contains('submenu--flip');
       submenu.style.bottom = 'auto';
       submenu.style.top = (btnRect.top - 58) + 'px';
+
+      if (flipped) {
+        // header07/08: box hangs to the LEFT of the button (tail anchors to
+        // the box's right edge — see .submenu--flip), so align that right
+        // edge with the button's right edge instead of matching left edges
+        const tipWidth = submenu.getBoundingClientRect().width;
+        submenu.style.left = (btnRect.right - tipWidth) + 'px';
+      } else {
+        submenu.style.left = btnRect.left + 'px';
+      }
+
+      // the last couple of tabs' tips would otherwise land straight under
+      // the floating video widget's corner — pull the tip left just enough
+      // to clear it (and the raw viewport edge) instead of overflowing/
+      // colliding with it
+      const tipRect = submenu.getBoundingClientRect();
+      const rightInset = Math.min(160, window.innerWidth * 0.083333);
+      const fabLeftEdge = window.innerWidth - rightInset - 96;
+      const maxRight = fabLeftEdge - 16;
+      if (tipRect.right > maxRight) {
+        const shifted = Math.max(16, maxRight - tipRect.width);
+        submenu.style.left = shifted + 'px';
+      }
     }
 
     // mobile: the tip banner defaults to left:24px in CSS (matching where
