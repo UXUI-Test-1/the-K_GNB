@@ -111,7 +111,6 @@
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    background: #fff;
     overflow: hidden;
   }
   .tab-icon img {
@@ -123,9 +122,9 @@
     object-fit: cover;
     transform: translate(-50%, -50%);
   }
+  /* 복지혜택 icon fills the whole 40px frame */
+  .tab-wrap[data-key="benefit"] .tab-icon img { left: 50%; width: 40px; height: 40px; }
   .tab-icon--flip img { transform: translate(-50%, -50%) scaleX(-1); }
-  .tab-wrap.active .tab-icon { background: transparent; }
-  .tab-wrap.active .tab-icon img { width: 40px; height: 40px; }
 
   /* plain (inactive) tab: 2px #ebebeb outline, icon + label */
   .tab-plain {
@@ -423,7 +422,7 @@
     .tab-pill { height: 36px; gap: 6px; padding: 0 12px 0 4px; border-radius: 12px; font-size: 13px; letter-spacing: -0.39px; }
     .tab-icon { width: 28px; height: 28px; }
     .tab-icon img { width: 25px; height: 25px; }
-    .tab-wrap.active .tab-icon img { width: 28px; height: 28px; }
+    .tab-wrap[data-key="benefit"] .tab-icon img { width: 28px; height: 28px; }
     .pill-fill { padding-left: 38px; }
 
     /* per-tab desktop tip lives inside the horizontally-scrolling nav —
@@ -478,8 +477,8 @@
           <button class="tab-btn" type="button">
             <span class="tab-plain"><span class="tab-icon"><img src="assets/gnb/menu-piggy.png" alt="" /></span><span class="tab-text">장기저축급여</span></span>
             <span class="tab-pill">
-              <span class="tab-icon"><img src="assets/gnb/menu-piggy.png" alt="" /></span><span class="pill-label pill-label--base">장기저축급여</span>
-              <span class="pill-fill" aria-hidden="true"><span class="pill-label">장기저축급여</span></span>
+              <span class="tab-icon"><img src="assets/gnb/menu-piggy.png" alt="" /></span><span class="pill-label pill-label--base">EP.01 장기저축급여</span>
+              <span class="pill-fill" aria-hidden="true"><span class="pill-label">EP.01 장기저축급여</span></span>
             </span>
           </button>
           <div class="submenu">
@@ -499,8 +498,8 @@
           <button class="tab-btn" type="button">
             <span class="tab-plain"><span class="tab-icon"><img src="assets/gnb/menu-bank.png" alt="" /></span><span class="tab-text">분할급여금</span></span>
             <span class="tab-pill">
-              <span class="tab-icon"><img src="assets/gnb/menu-bank.png" alt="" /></span><span class="pill-label pill-label--base">분할급여금</span>
-              <span class="pill-fill" aria-hidden="true"><span class="pill-label">분할급여금</span></span>
+              <span class="tab-icon"><img src="assets/gnb/menu-bank.png" alt="" /></span><span class="pill-label pill-label--base">EP.02 분할급여금</span>
+              <span class="pill-fill" aria-hidden="true"><span class="pill-label">EP.02 분할급여금</span></span>
             </span>
           </button>
           <div class="submenu">
@@ -518,10 +517,10 @@
 
         <div class="tab-wrap" data-key="deposit" data-content="assets/content-deposit-v2.jpg" data-content-mobile="assets/content-deposit-mobile.jpg" data-fab-bg="#8D3BFF" data-fab-color="#8D3BFF" data-fab-type="video" data-fab-media="assets/3편.mp4" data-fab-img-style="width:100%;height:100%;left:0;top:0;">
           <button class="tab-btn" type="button">
-            <span class="tab-plain"><span class="tab-icon"><img src="assets/gnb/menu-piggy.png" alt="" /></span><span class="tab-text">증좌신청</span></span>
+            <span class="tab-plain"><span class="tab-icon"><img src="assets/gnb/menu-piggy.png" alt="" /></span><span class="tab-text">증좌</span></span>
             <span class="tab-pill">
-              <span class="tab-icon"><img src="assets/gnb/menu-piggy.png" alt="" /></span><span class="pill-label pill-label--base">증좌신청</span>
-              <span class="pill-fill" aria-hidden="true"><span class="pill-label">증좌신청</span></span>
+              <span class="tab-icon"><img src="assets/gnb/menu-piggy.png" alt="" /></span><span class="pill-label pill-label--base">EP.03 증좌</span>
+              <span class="pill-fill" aria-hidden="true"><span class="pill-label">EP.03 증좌</span></span>
             </span>
           </button>
           <div class="submenu">
@@ -562,8 +561,8 @@
           <button class="tab-btn" type="button">
             <span class="tab-plain"><span class="tab-icon tab-icon--flip"><img src="assets/gnb/menu-person.png" alt="" /></span><span class="tab-text">회원혜택</span></span>
             <span class="tab-pill">
-              <span class="tab-icon tab-icon--flip"><img src="assets/gnb/menu-person.png" alt="" /></span><span class="pill-label pill-label--base">회원혜택</span>
-              <span class="pill-fill" aria-hidden="true"><span class="pill-label">회원혜택</span></span>
+              <span class="tab-icon tab-icon--flip"><img src="assets/gnb/menu-person.png" alt="" /></span><span class="pill-label pill-label--base">EP.05 회원혜택</span>
+              <span class="pill-fill" aria-hidden="true"><span class="pill-label">EP.05 회원혜택</span></span>
             </span>
           </button>
           <div class="submenu">
@@ -583,8 +582,8 @@
           <button class="tab-btn" type="button">
             <span class="tab-plain"><span class="tab-icon"><img src="assets/gnb/menu-safe.png" alt="" /></span><span class="tab-text">장기저축급여 2편</span></span>
             <span class="tab-pill">
-              <span class="tab-icon"><img src="assets/gnb/menu-safe.png" alt="" /></span><span class="pill-label pill-label--base">장기저축급여 2편</span>
-              <span class="pill-fill" aria-hidden="true"><span class="pill-label">장기저축급여 2편</span></span>
+              <span class="tab-icon"><img src="assets/gnb/menu-safe.png" alt="" /></span><span class="pill-label pill-label--base">EP.06 장기저축급여 2편</span>
+              <span class="pill-fill" aria-hidden="true"><span class="pill-label">EP.06 장기저축급여 2편</span></span>
             </span>
           </button>
           <div class="submenu">
@@ -604,8 +603,8 @@
           <button class="tab-btn" type="button">
             <span class="tab-plain"><span class="tab-icon"><img src="assets/gnb/menu-coin.png" alt="" /></span><span class="tab-text">증좌 2편</span></span>
             <span class="tab-pill">
-              <span class="tab-icon"><img src="assets/gnb/menu-coin.png" alt="" /></span><span class="pill-label pill-label--base">증좌 2편</span>
-              <span class="pill-fill" aria-hidden="true"><span class="pill-label">증좌 2편</span></span>
+              <span class="tab-icon"><img src="assets/gnb/menu-coin.png" alt="" /></span><span class="pill-label pill-label--base">EP.07 증좌 2편</span>
+              <span class="pill-fill" aria-hidden="true"><span class="pill-label">EP.07 증좌 2편</span></span>
             </span>
           </button>
           <div class="submenu submenu--flip">
@@ -625,8 +624,8 @@
           <button class="tab-btn" type="button">
             <span class="tab-plain"><span class="tab-icon"><img src="assets/gnb/menu-coins.png" alt="" /></span><span class="tab-text">분할급여금 2편</span></span>
             <span class="tab-pill">
-              <span class="tab-icon"><img src="assets/gnb/menu-coins.png" alt="" /></span><span class="pill-label pill-label--base">분할급여금 2편</span>
-              <span class="pill-fill" aria-hidden="true"><span class="pill-label">분할급여금 2편</span></span>
+              <span class="tab-icon"><img src="assets/gnb/menu-coins.png" alt="" /></span><span class="pill-label pill-label--base">EP.08 분할급여금 2편</span>
+              <span class="pill-fill" aria-hidden="true"><span class="pill-label">EP.08 분할급여금 2편</span></span>
             </span>
           </button>
           <div class="submenu submenu--flip">
