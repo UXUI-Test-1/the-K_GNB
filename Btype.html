@@ -395,6 +395,55 @@
     flex: none;
   }
 
+  /* ---------- Video modal ---------- */
+  .video-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.5);
+    -webkit-backdrop-filter: blur(25px);
+    backdrop-filter: blur(25px);
+  }
+  .video-modal.open { display: flex; }
+
+  .video-modal-player {
+    display: block;
+    width: min(79.5313vw, calc((100vh - 120px) * 16 / 9));
+    aspect-ratio: 16 / 9;
+    background: #000;
+  }
+
+  .video-modal-close {
+    position: absolute;
+    top: 36px;
+    right: 36px;
+    width: 84px;
+    height: 84px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: var(--blue-primary);
+    cursor: pointer;
+  }
+  .video-modal-close::before,
+  .video-modal-close::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 2px;
+    height: 38px;
+    background: #fff;
+  }
+  .video-modal-close::before { transform: translate(-50%, -50%) rotate(45deg); }
+  .video-modal-close::after { transform: translate(-50%, -50%) rotate(-45deg); }
+  .video-modal-close:focus-visible { outline: 2px solid var(--blue-accent); outline-offset: 4px; }
+
+  body.modal-open { overflow: hidden; }
+
   /* header mobile layout, same breakpoint as the content swap (768px) */
   @media (max-width: 768px) {
     header { box-shadow: 0px 4px 5px rgba(0, 0, 0, 0.15); }
@@ -402,6 +451,10 @@
     /* 96px * 0.625 = 60px circle on mobile */
     .video-fab { top: 12px; right: 16px; transform: scale(0.625); transform-origin: top right; }
     .video-fab-tip { display: none; }
+
+    .video-modal-player { width: 100vw; }
+    .video-modal-close { top: 12px; right: 12px; width: 44px; height: 44px; }
+    .video-modal-close::before, .video-modal-close::after { height: 20px; }
 
     .gnb { padding: 40px 20px 24px 24px; }
     .logo { font-size: 25px; letter-spacing: -0.76px; }
@@ -671,6 +724,11 @@
       </span>
     </a>
 
+    <div class="video-modal" id="videoModal" role="dialog" aria-modal="true" aria-label="The-K 혜택마트">
+      <button class="video-modal-close" id="videoModalClose" type="button" aria-label="닫기"></button>
+      <video class="video-modal-player" id="videoModalPlayer" src="assets/The-K 혜택마트-1분 30초_최종.mp4" controls playsinline preload="none"></video>
+    </div>
+
     <main>
       <img class="content-image" id="contentImage" src="assets/content.jpg" alt="The-K 더 캐보자 콘텐츠" />
 
@@ -829,6 +887,30 @@
         ? '<video src="' + media + '" style="' + imgStyle + '" autoplay muted loop playsinline></video>'
         : '<img src="' + media + '" alt="" style="' + imgStyle + '" />';
     }
+
+    // video modal: opens from the floating widget, autoplays (no loop),
+    // and is reset + paused again on close
+    const videoModal = document.getElementById('videoModal');
+    const videoModalPlayer = document.getElementById('videoModalPlayer');
+    let videoPlayTimer = null;
+    function openVideoModal() {
+      videoModal.classList.add('open');
+      document.body.classList.add('modal-open');
+      videoModalPlayer.currentTime = 0;
+      // start playing 2s after the modal appears
+      clearTimeout(videoPlayTimer);
+      videoPlayTimer = setTimeout(() => videoModalPlayer.play().catch(() => {}), 2000);
+    }
+    function closeVideoModal() {
+      clearTimeout(videoPlayTimer);
+      videoModal.classList.remove('open');
+      document.body.classList.remove('modal-open');
+      videoModalPlayer.pause();
+    }
+    videoFab.addEventListener('click', (e) => { e.preventDefault(); openVideoModal(); });
+    document.getElementById('videoModalClose').addEventListener('click', closeVideoModal);
+    videoModal.addEventListener('click', (e) => { if (e.target === videoModal) closeVideoModal(); });
+    window.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeVideoModal(); });
 
     // pause the fab's video while the page is scrolled, resume once back
     // at the top
