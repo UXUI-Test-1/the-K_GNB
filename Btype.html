@@ -15,6 +15,9 @@
 
   * { box-sizing: border-box; }
 
+  /* never let anything (tips, fixed widgets, scrolled menus) widen the page sideways */
+  html, body { overflow-x: clip; }
+
   body {
     margin: 0;
     font-family: "Pretendard", -apple-system, BlinkMacSystemFont, "Malgun Gothic", sans-serif;
@@ -65,6 +68,7 @@
     padding: 0 min(160px, 8.3333vw) 12px;
     overflow-x: auto;
     overflow-y: hidden;
+    overscroll-behavior-x: contain;
     scrollbar-width: none;
   }
   nav.menu::-webkit-scrollbar { display: none; }
@@ -156,7 +160,7 @@
     overflow: hidden;
     align-items: center;
     gap: 8px;
-    background: var(--blue-light);
+    background: color-mix(in srgb, var(--tab-color, var(--blue-accent)) 15%, #fff);
     border-radius: 16px;
     height: 56px;
     padding: 0 20px 0 8px;
@@ -176,7 +180,7 @@
   .pill-label--base {
     position: relative;
     z-index: 1;
-    color: var(--blue-primary);
+    color: var(--tab-color, var(--blue-accent));
   }
 
   .pill-fill {
@@ -185,7 +189,7 @@
     display: flex;
     align-items: center;
     padding-left: 56px;
-    background: var(--blue-accent);
+    background: var(--tab-color, var(--blue-accent));
     color: #fff;
     clip-path: inset(0 100% 0 0);
     will-change: clip-path;
@@ -227,7 +231,7 @@
     font-weight: 500;
     font-size: 16px;
     letter-spacing: -0.48px;
-    color: var(--blue-accent);
+    color: var(--tab-color, var(--blue-accent));
     text-decoration: none;
     cursor: pointer;
     transition: font-weight 0.15s ease;
@@ -487,12 +491,14 @@
       display: flex;
       position: absolute;
       left: 24px;
-      /* Figma: tip top sits 14px above the mobile header's bottom edge
-         (tip top=124 vs header height=138) */
-      top: calc(100% - 14px);
+      /* Figma: tip top sits at y=120 within the mobile header */
+      top: 120px;
       flex-direction: column-reverse;
       align-items: flex-start;
       z-index: 10;
+      /* the tip overlaps the menu row, so it must not swallow touches/drags
+         meant for the horizontally scrolling menu underneath */
+      pointer-events: none;
       opacity: 1;
       filter: drop-shadow(0px 4px 7.5px rgba(0, 0, 0, 0.15));
       transition: opacity 0.4s ease;
@@ -503,15 +509,15 @@
     }
 
     .mobile-tip .submenu-box {
-      margin-top: -12px;
+      margin-top: -10px;
       gap: 12px;
-      padding: 12px;
+      padding: 10px 12px;
       border-radius: 12px;
     }
-    .mobile-tip .submenu-box a { font-size: 13px; letter-spacing: -0.39px; }
+    .mobile-tip .submenu-box a { font-size: 12px; letter-spacing: -0.36px; }
 
     .mobile-tip-arrow {
-      width: 278px;
+      width: 262px;
       height: 22px;
       transform: scaleY(-1);
     }
@@ -591,7 +597,7 @@
 
         <div class="tab-wrap active" data-key="benefit" data-content="assets/content.jpg" data-fab-bg="#0F68EE" data-fab-color="#2853F6" data-fab-type="video" data-fab-media="assets/4편.mp4" data-fab-img-style="width:86px;height:86px;left:50%;top:calc(50% + 2px);transform:translate(-50%,-50%);">
           <button class="tab-btn" type="button">
-            <span class="tab-plain"><span class="tab-icon"><img src="assets/gnb/menu-gift.png" alt="" /></span><span class="tab-text">EP.04 복지혜택</span></span>
+            <span class="tab-plain"><span class="tab-icon"><img src="assets/gnb/menu-gift.png" alt="" /></span><span class="tab-text">복지혜택</span></span>
             <span class="tab-pill">
               <span class="tab-icon"><img src="assets/gnb/menu-gift.png" alt="" /></span><span class="pill-label pill-label--base">EP.04 복지혜택</span>
               <span class="pill-fill" aria-hidden="true"><span class="pill-label">EP.04 복지혜택</span></span>
@@ -703,7 +709,7 @@
           <a href="#">#회원복지</a>
           <a href="#">#복지알림</a>
         </div>
-        <svg class="mobile-tip-arrow" viewBox="0 0 278 22" preserveAspectRatio="xMidYMin meet" xmlns="http://www.w3.org/2000/svg">
+        <svg class="mobile-tip-arrow" viewBox="0 0 262 22" preserveAspectRatio="xMidYMin meet" xmlns="http://www.w3.org/2000/svg">
           <path d="M28.4019 17.5C29.5566 19.5 32.4434 19.5 33.5981 17.5L37.0622 11.5C38.2169 9.5 36.7735 7 34.4641 7H27.5359C25.2265 7 23.7831 9.5 24.9378 11.5L28.4019 17.5Z" fill="white"/>
         </svg>
       </div>
@@ -746,6 +752,8 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/ScrollTrigger.min.js"></script>
   <script>
     const tabWraps = document.querySelectorAll('.tab-wrap');
+    // each tab's fill/text color = its floating widget's text color
+    tabWraps.forEach((w) => { if (w.dataset.fabColor) w.style.setProperty('--tab-color', w.dataset.fabColor); });
     const contentImage = document.getElementById('contentImage');
     const benefitFrame = document.getElementById('benefitFrame');
     // content images (firstpay/retire/deposit) keep swapping at 768px
@@ -864,7 +872,11 @@
     function positionMobileTip(wrap) {
       const headerRect = headerEl.getBoundingClientRect();
       const btnRect = wrap.querySelector('.tab-pill').getBoundingClientRect();
+      // follows its tab exactly while the menu scrolls (any overflow past the
+      // viewport edge is clipped by html/body overflow-x: clip)
       mobileTip.style.left = (btnRect.left - headerRect.left) + 'px';
+      // the mobile tip lives outside .tab-wrap, so carry the tab color over
+      if (wrap.dataset.fabColor) mobileTip.style.setProperty('--tab-color', wrap.dataset.fabColor);
     }
 
     // floating "watch video" widget: swaps circle bg/media/text color per
@@ -939,7 +951,11 @@
     }
 
     tabWraps.forEach((wrap) => {
-      wrap.querySelector('.tab-btn').addEventListener('click', () => setActive(wrap));
+      wrap.querySelector('.tab-btn').addEventListener('click', () => {
+        // switching to a different tab always starts from the top of the page
+        if (!wrap.classList.contains('active')) window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+        setActive(wrap);
+      });
     });
 
     const initialActive = document.querySelector('.tab-wrap.active');
