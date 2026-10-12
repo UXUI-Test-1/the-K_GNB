@@ -897,9 +897,9 @@
       videoModal.classList.add('open');
       document.body.classList.add('modal-open');
       videoModalPlayer.currentTime = 0;
-      // start playing 2s after the modal appears
+      // start playing 0.8s after the modal appears
       clearTimeout(videoPlayTimer);
-      videoPlayTimer = setTimeout(() => videoModalPlayer.play().catch(() => {}), 2000);
+      videoPlayTimer = setTimeout(() => videoModalPlayer.play().catch(() => {}), 800);
     }
     function closeVideoModal() {
       clearTimeout(videoPlayTimer);
