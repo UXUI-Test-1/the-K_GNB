@@ -117,18 +117,14 @@
     border-radius: 50%;
     overflow: hidden;
   }
+  /* icons are pre-cropped from Figma to fill the frame exactly
+     (assets/gnb/v2: icon-dN = desktop 40px, icon-mN = mobile 22px) */
+  .tab-icon picture { display: block; width: 100%; height: 100%; }
   .tab-icon img {
-    position: absolute;
-    left: calc(50% + 0.5px);
-    top: 50%;
-    width: 36px;
-    height: 36px;
-    object-fit: cover;
-    transform: translate(-50%, -50%);
+    display: block;
+    width: 100%;
+    height: 100%;
   }
-  /* 복지혜택 icon fills the whole 40px frame */
-  .tab-wrap[data-key="benefit"] .tab-icon img { left: 50%; width: 40px; height: 40px; }
-  .tab-icon--flip img { transform: translate(-50%, -50%) scaleX(-1); }
 
   /* plain (inactive) tab: 2px #ebebeb outline, icon + label */
   .tab-plain {
@@ -142,15 +138,16 @@
     font-weight: 700;
     font-size: 24px;
     letter-spacing: -0.72px;
-    color: #909fcc;
+    color: #999;
     white-space: nowrap;
     text-transform: uppercase;
     transition: color 0.2s ease, border-color 0.2s ease;
   }
 
+  /* hover = same color as the active (pill) state */
   .tab-btn:hover .tab-plain {
-    color: var(--blue-accent);
-    border-color: var(--blue-light);
+    color: var(--tab-color, var(--blue-accent));
+    border-color: color-mix(in srgb, var(--tab-color, var(--blue-accent)) 15%, #fff);
   }
 
   /* boxed (active) tab with scroll fill */
@@ -196,7 +193,7 @@
     z-index: 2;
   }
 
-  /* ---------- Speech bubble (always visible on the active tab, left-aligned) ---------- */
+  /* ---------- Speech bubble (desktop: shown while hovering a menu, left-aligned) ---------- */
   .submenu {
     display: none;
     /* fixed + JS-computed left/bottom: nav.menu needs overflow-x:auto for
@@ -208,7 +205,7 @@
     z-index: 10;
   }
 
-  .tab-wrap.active .submenu {
+  .tab-wrap.tip-open .submenu {
     display: flex;
     /* single drop-shadow around the whole bubble silhouette (box + tail) */
     filter: drop-shadow(0px 8px 9.1px rgba(0, 0, 0, 0.22));
@@ -261,6 +258,66 @@
     display: none;
   }
 
+
+  /* ---------- Footer (PC: 4,5,6,7,8편 / mobile: 4,5,7,8편) ---------- */
+  .site-footer { display: none; background: #f5f8fd; }
+  .site-footer.show-pc { display: block; }
+  .site-footer--mo { display: none; }
+
+  .site-footer--pc { padding: 60px 24px 96px; }
+  .footer-inner { width: min(1200px, 100%); margin: 0 auto; }
+  .footer-logo { position: relative; flex: none; display: block; }
+  .footer-logo img { position: absolute; display: block; max-width: none; }
+  .site-footer--pc .footer-logo { width: 385.51px; height: 34.26px; overflow: hidden; }
+  .site-footer--pc .footer-logo .l1 { inset: -0.03% 0 8.88% 20.3%; width: 79.7%; height: 91.15%; }
+  .site-footer--pc .footer-logo .l2 { inset: 15.94% 81.12% 0 0; width: 18.88%; height: 84.06%; }
+  .footer-top { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
+  .footer-links { display: flex; align-items: center; height: 52px; gap: 4px; }
+  .footer-links a { padding: 0 12px; font-weight: 500; font-size: 18px; color: #14181c; text-decoration: none; white-space: nowrap; }
+  .footer-links a.strong { font-weight: 700; }
+  .footer-divider { height: 1px; background: #666e75; opacity: 0.2; margin: 24px 0 32px; }
+  .footer-info { display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 8px 24px; line-height: normal; }
+  .footer-addr { margin: 0; font-weight: 400; font-size: 16px; color: #404549; }
+  .footer-copy { margin: 0; font-weight: 500; font-size: 15px; color: #666e75; opacity: 0.4; }
+
+  .site-footer--mo { padding: 32px 24px 60px; font-family: "Paperlogy", "Pretendard", sans-serif; }
+  .site-footer--mo .footer-inner { width: min(327px, 100%); }
+  .site-footer--mo .footer-logo { width: 240px; height: 21.329px; overflow: hidden; }
+  .site-footer--mo .footer-logo .l1 { inset: -0.04% 0 8.87% 20.3%; width: 79.7%; height: 91.17%; }
+  .site-footer--mo .footer-logo .l2 { inset: 15.93% 81.12% 0.01% 0; width: 18.88%; height: 84.06%; }
+  .footer-mo-links { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 9px; margin: 32px 0 18px; opacity: 0.7; }
+  .footer-mo-links a { font-weight: 700; font-size: 14px; line-height: 1.3; letter-spacing: -0.14px; color: #000; text-decoration: none; white-space: nowrap; }
+  .footer-mo-links i { width: 1px; height: 12px; background: #d8dce2; }
+  .site-footer--mo .footer-divider { margin: 0 0 28px; }
+  .footer-mo-addr { margin: 0 0 24px; font-weight: 700; font-size: 13px; line-height: 1.5; color: #000; opacity: 0.5; text-transform: uppercase; }
+  .footer-mo-copy { margin: 0; font-weight: 700; font-size: 11px; line-height: 1.5; color: #000; opacity: 0.3; text-transform: uppercase; }
+
+  @media (max-width: 768px) {
+    .site-footer.show-pc { display: none; }
+    .site-footer--mo.show-mo { display: block; }
+  }
+
+  /* ---------- 혜택마트 inline video ---------- */
+  .video-section {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 800px;
+    padding: 60px 24px;
+    background: #fff;
+  }
+  .video-section.active { display: flex; }
+  .video-section video {
+    display: block;
+    width: min(1200px, 100%);
+    aspect-ratio: 16 / 9;
+    background: #000;
+  }
+  @media (max-width: 768px) {
+    .video-section { min-height: 0; padding: 32px 0; }
+  }
+
   /* ---------- Content ---------- */
   main {
     width: 100%;
@@ -311,6 +368,11 @@
     object-position: center top;
     z-index: 0;
   }
+
+  /* 벽돌깨기: PC foreground is the 377px "01" frame */
+  .future-frame picture { display: block; }
+  .future-frame .benefit-fg { width: 377px; }
+  @media (max-width: 768px) { .future-frame .benefit-fg { width: 375px; } }
 
   .benefit-fg {
     position: relative;
@@ -392,6 +454,7 @@
     color: var(--blue-accent);
     text-transform: uppercase;
   }
+  .video-fab-icon { width: 14px; height: 14px; flex: none; margin-right: 2px; }
   .video-fab-play {
     width: 10px;
     height: 8px;
@@ -399,66 +462,14 @@
     flex: none;
   }
 
-  /* ---------- Video modal ---------- */
-  .video-modal {
-    position: fixed;
-    inset: 0;
-    z-index: 1000;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    background: rgba(255, 255, 255, 0.5);
-    -webkit-backdrop-filter: blur(25px);
-    backdrop-filter: blur(25px);
-  }
-  .video-modal.open { display: flex; }
-
-  .video-modal-player {
-    display: block;
-    width: min(79.5313vw, calc((100vh - 120px) * 16 / 9));
-    aspect-ratio: 16 / 9;
-    background: #000;
-  }
-
-  .video-modal-close {
-    position: absolute;
-    top: 36px;
-    right: 36px;
-    width: 84px;
-    height: 84px;
-    padding: 0;
-    border: none;
-    border-radius: 50%;
-    background: var(--blue-primary);
-    cursor: pointer;
-  }
-  .video-modal-close::before,
-  .video-modal-close::after {
-    content: "";
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    width: 2px;
-    height: 38px;
-    background: #fff;
-  }
-  .video-modal-close::before { transform: translate(-50%, -50%) rotate(45deg); }
-  .video-modal-close::after { transform: translate(-50%, -50%) rotate(-45deg); }
-  .video-modal-close:focus-visible { outline: 2px solid var(--blue-accent); outline-offset: 4px; }
-
-  body.modal-open { overflow: hidden; }
 
   /* header mobile layout, same breakpoint as the content swap (768px) */
   @media (max-width: 768px) {
     header { box-shadow: 0px 4px 5px rgba(0, 0, 0, 0.15); }
 
     /* 96px * 0.625 = 60px circle on mobile */
-    .video-fab { top: 12px; right: 16px; transform: scale(0.625); transform-origin: top right; }
+    .video-fab { top: 24px; right: 15px; transform: scale(0.625); transform-origin: top right; }
     .video-fab-tip { display: none; }
-
-    .video-modal-player { width: 100vw; }
-    .video-modal-close { top: 12px; right: 12px; width: 44px; height: 44px; }
-    .video-modal-close::before, .video-modal-close::after { height: 20px; }
 
     .gnb { padding: 40px 20px 24px 24px; }
     .logo { font-size: 25px; letter-spacing: -0.76px; }
@@ -469,23 +480,32 @@
       overflow-x: auto;
       -webkit-overflow-scrolling: touch;
       scrollbar-width: none;
-      height: 48px;
-      padding: 0 24px 8px;
+      height: 38px;
+      padding: 0 10px 8px;
     }
     nav.menu::-webkit-scrollbar { display: none; }
-    .menu-track { gap: 12px; margin: 0; }
+    .menu-track { gap: 4px; margin: 0; }
 
-    .tab-plain { height: 36px; gap: 6px; padding: 0 12px 0 4px; border-radius: 12px; font-size: 13px; letter-spacing: -0.39px; }
-    .tab-pill { height: 36px; gap: 6px; padding: 0 12px 0 4px; border-radius: 12px; font-size: 13px; letter-spacing: -0.39px; }
-    .tab-icon { width: 28px; height: 28px; }
-    .tab-icon img { width: 25px; height: 25px; }
-    .tab-wrap[data-key="benefit"] .tab-icon img { width: 28px; height: 28px; }
-    .pill-fill { padding-left: 38px; }
+    /* Figma mobile GNB: inactive = 30px icon-only square, active = icon + label */
+    .tab-plain {
+      width: 30px;
+      height: 30px;
+      justify-content: center;
+      gap: 0;
+      padding: 0;
+      border: 1px solid #ebebeb;
+      border-radius: 10px;
+      background: #fff;
+    }
+    .tab-text { display: none; }
+    .tab-pill { height: 30px; gap: 4px; padding: 0 8px 0 4px; border-radius: 10px; font-size: 12px; letter-spacing: -0.36px; }
+    .tab-icon { width: 22px; height: 22px; }
+    .pill-fill { padding-left: 30px; }
 
     /* per-tab desktop tip lives inside the horizontally-scrolling nav —
        hide it and show the shared .mobile-tip banner below instead.
        (must match .tab-wrap.active .submenu's specificity to actually win) */
-    .tab-wrap.active .submenu { display: none; }
+    .tab-wrap.tip-open .submenu { display: none; }
 
     .mobile-tip {
       display: flex;
@@ -499,14 +519,12 @@
       /* the tip overlaps the menu row, so it must not swallow touches/drags
          meant for the horizontally scrolling menu underneath */
       pointer-events: none;
-      opacity: 1;
-      filter: drop-shadow(0px 4px 7.5px rgba(0, 0, 0, 0.15));
-      transition: opacity 0.4s ease;
-    }
-    body.tip-collapsed .mobile-tip {
+      /* shown only after a menu tap (body.mobile-tip-open) */
       opacity: 0;
-      pointer-events: none;
+      filter: drop-shadow(0px 4px 7.5px rgba(0, 0, 0, 0.15));
+      transition: opacity 0.3s ease;
     }
+    body.mobile-tip-open .mobile-tip { opacity: 1; }
 
     .mobile-tip .submenu-box {
       margin-top: -10px;
@@ -532,11 +550,11 @@
       </div>
       <nav class="menu" id="navMenu">
        <div class="menu-track">
-        <div class="tab-wrap" data-key="firstpay" data-content="assets/content-firstpay-v2.jpg" data-content-mobile="assets/content-firstpay-mobile.jpg" data-fab-bg="#FF5285" data-fab-color="#FF5285" data-fab-type="video" data-fab-media="assets/1편.mp4" data-fab-img-style="width:100%;height:100%;left:0;top:0;">
+        <div class="tab-wrap" data-key="firstpay" data-tab-color="#FF2465" data-content="assets/content-firstpay-v2.jpg" data-content-mobile="assets/content-firstpay-mobile.jpg" data-fab-bg="#FF5285" data-fab-color="#FF5285" data-fab-type="video" data-fab-media="assets/1편.mp4" data-fab-img-style="width:100%;height:100%;left:0;top:0;">
           <button class="tab-btn" type="button">
-            <span class="tab-plain"><span class="tab-icon"><img src="assets/gnb/menu-piggy.png" alt="" /></span><span class="tab-text">장기저축급여</span></span>
+            <span class="tab-plain"><span class="tab-icon"><picture><source media="(max-width: 768px)" srcset="assets/gnb/v2/icon-m1.png" /><img src="assets/gnb/v2/icon-d1.png" alt="" /></picture></span><span class="tab-text">장기저축급여</span></span>
             <span class="tab-pill">
-              <span class="tab-icon"><img src="assets/gnb/menu-piggy.png" alt="" /></span><span class="pill-label pill-label--base">EP.01 장기저축급여</span>
+              <span class="tab-icon"><picture><source media="(max-width: 768px)" srcset="assets/gnb/v2/icon-m1.png" /><img src="assets/gnb/v2/icon-d1.png" alt="" /></picture></span><span class="pill-label pill-label--base">EP.01 장기저축급여</span>
               <span class="pill-fill" aria-hidden="true"><span class="pill-label">EP.01 장기저축급여</span></span>
             </span>
           </button>
@@ -555,9 +573,9 @@
 
         <div class="tab-wrap" data-key="retire" data-content="assets/content-retire-v2.jpg" data-content-mobile="assets/content-retire-mobile.jpg" data-fab-bg="#0F68EE" data-fab-color="#2853F6" data-fab-type="video" data-fab-media="assets/2편.mp4" data-fab-img-style="width:100%;height:100%;left:0;top:0;">
           <button class="tab-btn" type="button">
-            <span class="tab-plain"><span class="tab-icon"><img src="assets/gnb/menu-bank.png" alt="" /></span><span class="tab-text">분할급여금</span></span>
+            <span class="tab-plain"><span class="tab-icon"><picture><source media="(max-width: 768px)" srcset="assets/gnb/v2/icon-m2.png" /><img src="assets/gnb/v2/icon-d2.png" alt="" /></picture></span><span class="tab-text">분할급여금</span></span>
             <span class="tab-pill">
-              <span class="tab-icon"><img src="assets/gnb/menu-bank.png" alt="" /></span><span class="pill-label pill-label--base">EP.02 분할급여금</span>
+              <span class="tab-icon"><picture><source media="(max-width: 768px)" srcset="assets/gnb/v2/icon-m2.png" /><img src="assets/gnb/v2/icon-d2.png" alt="" /></picture></span><span class="pill-label pill-label--base">EP.02 분할급여금</span>
               <span class="pill-fill" aria-hidden="true"><span class="pill-label">EP.02 분할급여금</span></span>
             </span>
           </button>
@@ -576,9 +594,9 @@
 
         <div class="tab-wrap" data-key="deposit" data-content="assets/content-deposit-v2.jpg" data-content-mobile="assets/content-deposit-mobile.jpg" data-fab-bg="#8D3BFF" data-fab-color="#8D3BFF" data-fab-type="video" data-fab-media="assets/3편.mp4" data-fab-img-style="width:100%;height:100%;left:0;top:0;">
           <button class="tab-btn" type="button">
-            <span class="tab-plain"><span class="tab-icon"><img src="assets/gnb/menu-piggy.png" alt="" /></span><span class="tab-text">증좌</span></span>
+            <span class="tab-plain"><span class="tab-icon"><picture><source media="(max-width: 768px)" srcset="assets/gnb/v2/icon-m3.png" /><img src="assets/gnb/v2/icon-d3.png" alt="" /></picture></span><span class="tab-text">증좌</span></span>
             <span class="tab-pill">
-              <span class="tab-icon"><img src="assets/gnb/menu-piggy.png" alt="" /></span><span class="pill-label pill-label--base">EP.03 증좌</span>
+              <span class="tab-icon"><picture><source media="(max-width: 768px)" srcset="assets/gnb/v2/icon-m3.png" /><img src="assets/gnb/v2/icon-d3.png" alt="" /></picture></span><span class="pill-label pill-label--base">EP.03 증좌</span>
               <span class="pill-fill" aria-hidden="true"><span class="pill-label">EP.03 증좌</span></span>
             </span>
           </button>
@@ -595,11 +613,11 @@
           </div>
         </div>
 
-        <div class="tab-wrap active" data-key="benefit" data-content="assets/content.jpg" data-fab-bg="#0F68EE" data-fab-color="#2853F6" data-fab-type="video" data-fab-media="assets/4편.mp4" data-fab-img-style="width:86px;height:86px;left:50%;top:calc(50% + 2px);transform:translate(-50%,-50%);">
+        <div class="tab-wrap active" data-key="benefit" data-fab-label="장바구니 담으러 가기" data-fab-icon="assets/gnb/v2/icon-bag.svg" data-content="assets/content.jpg" data-fab-bg="#0F68EE" data-fab-color="#2853F6" data-fab-type="video" data-fab-media="assets/4편.mp4" data-fab-img-style="width:86px;height:86px;left:50%;top:calc(50% + 2px);transform:translate(-50%,-50%);">
           <button class="tab-btn" type="button">
-            <span class="tab-plain"><span class="tab-icon"><img src="assets/gnb/menu-gift.png" alt="" /></span><span class="tab-text">복지혜택</span></span>
+            <span class="tab-plain"><span class="tab-icon"><picture><source media="(max-width: 768px)" srcset="assets/gnb/v2/icon-m4.png" /><img src="assets/gnb/v2/icon-d4.png" alt="" /></picture></span><span class="tab-text">복지혜택</span></span>
             <span class="tab-pill">
-              <span class="tab-icon"><img src="assets/gnb/menu-gift.png" alt="" /></span><span class="pill-label pill-label--base">EP.04 복지혜택</span>
+              <span class="tab-icon"><picture><source media="(max-width: 768px)" srcset="assets/gnb/v2/icon-m4.png" /><img src="assets/gnb/v2/icon-d4.png" alt="" /></picture></span><span class="pill-label pill-label--base">EP.04 복지혜택</span>
               <span class="pill-fill" aria-hidden="true"><span class="pill-label">EP.04 복지혜택</span></span>
             </span>
           </button>
@@ -618,10 +636,10 @@
 
         <div class="tab-wrap" data-key="future" data-content="" data-blank-color="#E8F5E9" data-fab-bg="#2E9E44" data-fab-color="#2E9E44" data-fab-type="image" data-fab-media="assets/fab-blank-v2.png" data-fab-img-style="width:64px;height:64px;left:50%;top:50%;transform:translate(-50%,-50%);">
           <button class="tab-btn" type="button">
-            <span class="tab-plain"><span class="tab-icon tab-icon--flip"><img src="assets/gnb/menu-person.png" alt="" /></span><span class="tab-text">회원혜택</span></span>
+            <span class="tab-plain"><span class="tab-icon"><picture><source media="(max-width: 768px)" srcset="assets/gnb/v2/icon-m5.png" /><img src="assets/gnb/v2/icon-d5.png" alt="" /></picture></span><span class="tab-text">혜택마트</span></span>
             <span class="tab-pill">
-              <span class="tab-icon tab-icon--flip"><img src="assets/gnb/menu-person.png" alt="" /></span><span class="pill-label pill-label--base">EP.05 회원혜택</span>
-              <span class="pill-fill" aria-hidden="true"><span class="pill-label">EP.05 회원혜택</span></span>
+              <span class="tab-icon"><picture><source media="(max-width: 768px)" srcset="assets/gnb/v2/icon-m5.png" /><img src="assets/gnb/v2/icon-d5.png" alt="" /></picture></span><span class="pill-label pill-label--base">EP.05 혜택마트</span>
+              <span class="pill-fill" aria-hidden="true"><span class="pill-label">EP.05 혜택마트</span></span>
             </span>
           </button>
           <div class="submenu">
@@ -639,18 +657,18 @@
 
         <div class="tab-wrap" data-key="lowtax" data-content="" data-blank-color="#FFF9E6" data-fab-bg="#E6A700" data-fab-color="#E6A700" data-fab-type="image" data-fab-media="assets/fab-blank-v2.png" data-fab-img-style="width:64px;height:64px;left:50%;top:50%;transform:translate(-50%,-50%);">
           <button class="tab-btn" type="button">
-            <span class="tab-plain"><span class="tab-icon"><img src="assets/gnb/menu-safe.png" alt="" /></span><span class="tab-text">장기저축급여 2편</span></span>
+            <span class="tab-plain"><span class="tab-icon"><picture><source media="(max-width: 768px)" srcset="assets/gnb/v2/icon-m6.png" /><img src="assets/gnb/v2/icon-d6.png" alt="" /></picture></span><span class="tab-text">벽돌깨기</span></span>
             <span class="tab-pill">
-              <span class="tab-icon"><img src="assets/gnb/menu-safe.png" alt="" /></span><span class="pill-label pill-label--base">EP.06 장기저축급여 2편</span>
-              <span class="pill-fill" aria-hidden="true"><span class="pill-label">EP.06 장기저축급여 2편</span></span>
+              <span class="tab-icon"><picture><source media="(max-width: 768px)" srcset="assets/gnb/v2/icon-m6.png" /><img src="assets/gnb/v2/icon-d6.png" alt="" /></picture></span><span class="pill-label pill-label--base">EP.06 벽돌깨기</span>
+              <span class="pill-fill" aria-hidden="true"><span class="pill-label">EP.06 벽돌깨기</span></span>
             </span>
           </button>
           <div class="submenu">
             <div class="submenu-box">
-              <a href="#">#저율과세혜택</a>
-              <a href="#">#연복리효과</a>
-              <a href="#">#교직원전용상품</a>
-              <a href="#">#스마트재테크</a>
+              <a href="#">#벽돌깨기</a>
+              <a href="#">#게임참여</a>
+              <a href="#">#경품받기</a>
+              <a href="#">#더케이오락실</a>
             </div>
             <svg class="submenu-arrow" viewBox="0 0 348 30" preserveAspectRatio="xMidYMin meet" xmlns="http://www.w3.org/2000/svg">
               <path d="M32.5359 24C34.0755 26.6667 37.9245 26.6667 39.4641 24L45.5263 13.5C47.0659 10.8333 45.1414 7.5 42.0622 7.5H29.9378C26.8586 7.5 24.9341 10.8333 26.4737 13.5L32.5359 24Z" fill="white"/>
@@ -660,9 +678,9 @@
 
         <div class="tab-wrap" data-key="deduction" data-content="" data-blank-color="#F3E8FF" data-fab-bg="#8D3BFF" data-fab-color="#8D3BFF" data-fab-type="image" data-fab-media="assets/fab-blank-v2.png" data-fab-img-style="width:64px;height:64px;left:50%;top:50%;transform:translate(-50%,-50%);">
           <button class="tab-btn" type="button">
-            <span class="tab-plain"><span class="tab-icon"><img src="assets/gnb/menu-coin.png" alt="" /></span><span class="tab-text">증좌 2편</span></span>
+            <span class="tab-plain"><span class="tab-icon"><picture><source media="(max-width: 768px)" srcset="assets/gnb/v2/icon-m7.png" /><img src="assets/gnb/v2/icon-d7.png" alt="" /></picture></span><span class="tab-text">증좌 2편</span></span>
             <span class="tab-pill">
-              <span class="tab-icon"><img src="assets/gnb/menu-coin.png" alt="" /></span><span class="pill-label pill-label--base">EP.07 증좌 2편</span>
+              <span class="tab-icon"><picture><source media="(max-width: 768px)" srcset="assets/gnb/v2/icon-m7.png" /><img src="assets/gnb/v2/icon-d7.png" alt="" /></picture></span><span class="pill-label pill-label--base">EP.07 증좌 2편</span>
               <span class="pill-fill" aria-hidden="true"><span class="pill-label">EP.07 증좌 2편</span></span>
             </span>
           </button>
@@ -681,9 +699,9 @@
 
         <div class="tab-wrap" data-key="yearend" data-content="" data-blank-color="#FFF0E0" data-fab-bg="#FF7A00" data-fab-color="#FF7A00" data-fab-type="image" data-fab-media="assets/fab-blank-v2.png" data-fab-img-style="width:64px;height:64px;left:50%;top:50%;transform:translate(-50%,-50%);">
           <button class="tab-btn" type="button">
-            <span class="tab-plain"><span class="tab-icon"><img src="assets/gnb/menu-coins.png" alt="" /></span><span class="tab-text">분할급여금 2편</span></span>
+            <span class="tab-plain"><span class="tab-icon"><picture><source media="(max-width: 768px)" srcset="assets/gnb/v2/icon-m8.png" /><img src="assets/gnb/v2/icon-d8.png" alt="" /></picture></span><span class="tab-text">분할급여금 2편</span></span>
             <span class="tab-pill">
-              <span class="tab-icon"><img src="assets/gnb/menu-coins.png" alt="" /></span><span class="pill-label pill-label--base">EP.08 분할급여금 2편</span>
+              <span class="tab-icon"><picture><source media="(max-width: 768px)" srcset="assets/gnb/v2/icon-m8.png" /><img src="assets/gnb/v2/icon-d8.png" alt="" /></picture></span><span class="pill-label pill-label--base">EP.08 분할급여금 2편</span>
               <span class="pill-fill" aria-hidden="true"><span class="pill-label">EP.08 분할급여금 2편</span></span>
             </span>
           </button>
@@ -715,7 +733,7 @@
       </div>
     </header>
 
-    <a class="video-fab" id="videoFab" href="#" aria-label="영상 보러가기">
+    <a class="video-fab" id="videoFab" href="#" onclick="return false" aria-label="영상 보러가기">
       <span class="video-fab-circle" id="videoFabCircle"></span>
       <span class="video-fab-tip">
         <svg class="video-fab-tail" viewBox="0 0 91 22" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
@@ -730,10 +748,6 @@
       </span>
     </a>
 
-    <div class="video-modal" id="videoModal" role="dialog" aria-modal="true" aria-label="The-K 혜택마트">
-      <button class="video-modal-close" id="videoModalClose" type="button" aria-label="닫기"></button>
-      <video class="video-modal-player" id="videoModalPlayer" src="assets/The-K 혜택마트-1분 30초_최종.mp4" controls playsinline preload="none"></video>
-    </div>
 
     <main>
       <img class="content-image" id="contentImage" src="assets/content.jpg" alt="The-K 더 캐보자 콘텐츠" />
@@ -741,11 +755,60 @@
       <!-- 복지혜택 mobile only: fixed 375px-wide content over a full-width
            background that shrinks with the viewport and is fully hidden
            behind the content once the viewport reaches 375px -->
+      <!-- 벽돌깨기 (6편): background shrinks with the viewport, the 377px
+           "01" frame stays fixed, then swaps to the 375px mobile frame -->
+      <!-- 혜택마트 (5편): inline video in the content area -->
+      <section class="video-section" id="videoSection">
+        <video id="martVideo" src="assets/The-K 혜택마트-1분 30초_최종.mp4" controls playsinline preload="metadata"></video>
+      </section>
+
+      <div class="benefit-frame future-frame" id="futureFrame">
+        <img class="benefit-bg" src="assets/content-future-bg.png" alt="" aria-hidden="true" />
+        <picture>
+          <source media="(max-width: 768px)" srcset="assets/content-future-fg-mobile.png" />
+          <img class="benefit-fg" src="assets/content-future-fg-pc.png" alt="The-K 더 캐보자 벽돌깨기" />
+        </picture>
+      </div>
+
       <div class="benefit-frame" id="benefitFrame">
         <img class="benefit-bg" src="assets/benefit-bg-mobile.jpg" alt="" aria-hidden="true" />
         <img class="benefit-fg" src="assets/benefit-fg-mobile.jpg" alt="The-K 더 캐보자 복지혜택" />
       </div>
     </main>
+
+    <footer class="site-footer site-footer--pc" id="footerPc">
+      <div class="footer-inner">
+        <div class="footer-top">
+          <span class="footer-logo" role="img" aria-label="The-K 한국교직원공제회">
+            <img class="l1" src="assets/footer/logo-pc-1.svg" alt="" />
+            <img class="l2" src="assets/footer/logo-pc-2.svg" alt="" />
+          </span>
+          <nav class="footer-links">
+            <a href="#">일반신고</a><a href="#">부패공익신고</a><a href="#" class="strong">개인정보처리방침</a><a href="#">이용약관</a>
+          </nav>
+        </div>
+        <div class="footer-divider"></div>
+        <div class="footer-info">
+          <p class="footer-addr">07328 서울 영등포구 여의나루로 50 The-K한국교직원공제회</p>
+          <p class="footer-copy">Copyright©2026 KTCU. ALL RIGHTS RESERVED.</p>
+        </div>
+      </div>
+    </footer>
+
+    <footer class="site-footer site-footer--mo" id="footerMo">
+      <div class="footer-inner">
+        <span class="footer-logo" role="img" aria-label="The-K 한국교직원공제회">
+          <img class="l1" src="assets/footer/logo-mo-1.svg" alt="" />
+          <img class="l2" src="assets/footer/logo-mo-2.svg" alt="" />
+        </span>
+        <div class="footer-mo-links">
+          <a href="#">일반신고</a><i></i><a href="#">부패공익신고</a><i></i><a href="#">개인정보처리방침</a><i></i><a href="#">이용약관</a>
+        </div>
+        <div class="footer-divider"></div>
+        <p class="footer-mo-addr">07328 서울 영등포구 여의나루로 50<br />The-K한국교직원공제회</p>
+        <p class="footer-mo-copy">Copyright©2026 KTCU.&nbsp; ALL RIGHTS RESERVED.</p>
+      </div>
+    </footer>
   </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js"></script>
@@ -753,21 +816,47 @@
   <script>
     const tabWraps = document.querySelectorAll('.tab-wrap');
     // each tab's fill/text color = its floating widget's text color
-    tabWraps.forEach((w) => { if (w.dataset.fabColor) w.style.setProperty('--tab-color', w.dataset.fabColor); });
+    tabWraps.forEach((w) => { const c = w.dataset.tabColor || w.dataset.fabColor; if (c) w.style.setProperty('--tab-color', c); });
     const contentImage = document.getElementById('contentImage');
     const benefitFrame = document.getElementById('benefitFrame');
+    const futureFrame = document.getElementById('futureFrame');
+    const videoSection = document.getElementById('videoSection');
+    const martVideo = document.getElementById('martVideo');
     // content images (firstpay/retire/deposit) keep swapping at 768px
     const contentMobileQuery = window.matchMedia('(max-width: 768px)');
     // header mobile layout uses the same 768px breakpoint
     const headerMobileQuery = window.matchMedia('(max-width: 768px)');
 
+    // footer visibility per tab (4,5,6,7,8편 on PC; 4,5,7,8편 on mobile —
+    // the 6편 mobile frame already includes its own footer)
+    const footerPc = document.getElementById('footerPc');
+    const footerMo = document.getElementById('footerMo');
+    const FOOTER_PC = ['benefit', 'future', 'lowtax', 'deduction', 'yearend'];
+    const FOOTER_MO = ['benefit', 'future', 'deduction', 'yearend'];
+
     function applyContent(wrap) {
+      footerPc.classList.toggle('show-pc', FOOTER_PC.includes(wrap.dataset.key));
+      footerMo.classList.toggle('show-mo', FOOTER_MO.includes(wrap.dataset.key));
       // 복지혜택 always gets the fixed-375px-foreground + shrinking-background
       // treatment instead of the plain swapped <img>, at every width
       const useBenefitFrame = wrap.dataset.key === 'benefit';
+      const useVideo = wrap.dataset.key === 'future';
+      videoSection.classList.toggle('active', useVideo);
+      if (!useVideo) martVideo.pause();
+      const useFutureFrame = wrap.dataset.key === 'lowtax';
       benefitFrame.classList.toggle('active', useBenefitFrame);
+      futureFrame.classList.toggle('active', useFutureFrame);
 
-      if (useBenefitFrame) {
+      if (useVideo) {
+        contentImage.style.display = 'none';
+        const blank = document.getElementById('contentBlank');
+        if (blank) blank.style.display = 'none';
+        benefitFrame.classList.remove('active');
+        futureFrame.classList.remove('active');
+        return;
+      }
+
+      if (useBenefitFrame || useFutureFrame) {
         contentImage.style.display = 'none';
         const existingBlank = document.getElementById('contentBlank');
         if (existingBlank) existingBlank.style.display = 'none';
@@ -834,7 +923,7 @@
     function positionDesktopTip(wrap) {
       const submenu = wrap.querySelector('.submenu');
       if (!submenu) return;
-      const btnRect = wrap.querySelector('.tab-pill').getBoundingClientRect();
+      const btnRect = wrap.querySelector('.tab-btn').getBoundingClientRect();
       const flipped = submenu.classList.contains('submenu--flip');
       submenu.style.bottom = 'auto';
       submenu.style.top = (btnRect.top - 58) + 'px';
@@ -863,6 +952,30 @@
       }
     }
 
+    // desktop: right-clicking a menu (any tab, not just the active one) opens
+    // its tip; it closes on any outside click, Esc, scroll or resize
+    function closeDesktopTips() {
+      tabWraps.forEach((w) => w.classList.remove('tip-open'));
+    }
+    tabWraps.forEach((wrap) => {
+      wrap.querySelector('.tab-btn').addEventListener('contextmenu', (e) => {
+        if (headerMobileQuery.matches) return;
+        e.preventDefault();
+        closeDesktopTips();
+        wrap.classList.add('tip-open');
+        positionDesktopTip(wrap);
+      });
+    });
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.submenu')) closeDesktopTips();
+    });
+    document.addEventListener('contextmenu', (e) => {
+      if (!e.target.closest('.tab-btn')) closeDesktopTips();
+    });
+    window.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeDesktopTips(); });
+    window.addEventListener('scroll', closeDesktopTips, { passive: true });
+    window.addEventListener('resize', closeDesktopTips);
+
     // mobile: the tip banner defaults to left:24px in CSS (matching where
     // the box is scrolled to), but compute it from the box's actual
     // position instead so it always lines up even in edge cases (e.g. the
@@ -876,7 +989,8 @@
       // viewport edge is clipped by html/body overflow-x: clip)
       mobileTip.style.left = (btnRect.left - headerRect.left) + 'px';
       // the mobile tip lives outside .tab-wrap, so carry the tab color over
-      if (wrap.dataset.fabColor) mobileTip.style.setProperty('--tab-color', wrap.dataset.fabColor);
+      const c = wrap.dataset.tabColor || wrap.dataset.fabColor;
+      if (c) mobileTip.style.setProperty('--tab-color', c);
     }
 
     // floating "watch video" widget: swaps circle bg/media/text color per
@@ -884,6 +998,7 @@
     const videoFab = document.getElementById('videoFab');
     const videoFabCircle = document.getElementById('videoFabCircle');
     const videoFabPill = document.getElementById('videoFabPill');
+    const defaultPillHTML = videoFabPill.innerHTML;
     function updateVideoFab(wrap) {
       const media = wrap.dataset.fabMedia;
       if (!media) {
@@ -894,35 +1009,16 @@
       videoFab.classList.add('active');
       videoFabCircle.style.background = wrap.dataset.fabBg || '#0f68ee';
       videoFabPill.style.color = wrap.dataset.fabColor || '#2853f6';
+      // per-tab label/icon (4편: 장바구니), default is the play icon + 영상 보러가기
+      videoFabPill.innerHTML = wrap.dataset.fabLabel
+        ? (wrap.dataset.fabIcon ? '<img class="video-fab-icon" src="' + wrap.dataset.fabIcon + '" alt="" />' : '') + wrap.dataset.fabLabel
+        : defaultPillHTML;
       const imgStyle = 'position:absolute;' + (wrap.dataset.fabImgStyle || '');
       videoFabCircle.innerHTML = wrap.dataset.fabType === 'video'
         ? '<video src="' + media + '" style="' + imgStyle + '" autoplay muted loop playsinline></video>'
         : '<img src="' + media + '" alt="" style="' + imgStyle + '" />';
     }
 
-    // video modal: opens from the floating widget, autoplays (no loop),
-    // and is reset + paused again on close
-    const videoModal = document.getElementById('videoModal');
-    const videoModalPlayer = document.getElementById('videoModalPlayer');
-    let videoPlayTimer = null;
-    function openVideoModal() {
-      videoModal.classList.add('open');
-      document.body.classList.add('modal-open');
-      videoModalPlayer.currentTime = 0;
-      // start playing 0.8s after the modal appears
-      clearTimeout(videoPlayTimer);
-      videoPlayTimer = setTimeout(() => videoModalPlayer.play().catch(() => {}), 800);
-    }
-    function closeVideoModal() {
-      clearTimeout(videoPlayTimer);
-      videoModal.classList.remove('open');
-      document.body.classList.remove('modal-open');
-      videoModalPlayer.pause();
-    }
-    videoFab.addEventListener('click', (e) => { e.preventDefault(); openVideoModal(); });
-    document.getElementById('videoModalClose').addEventListener('click', closeVideoModal);
-    videoModal.addEventListener('click', (e) => { if (e.target === videoModal) closeVideoModal(); });
-    window.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeVideoModal(); });
 
     // pause the fab's video while the page is scrolled, resume once back
     // at the top
@@ -946,7 +1042,6 @@
       if (tags) mobileTipBox.innerHTML = tags.innerHTML;
 
       scrollActiveIntoView(wrap, !(opts && opts.instant));
-      positionDesktopTip(wrap);
       positionMobileTip(wrap);
     }
 
@@ -954,7 +1049,13 @@
       wrap.querySelector('.tab-btn').addEventListener('click', () => {
         // switching to a different tab always starts from the top of the page
         if (!wrap.classList.contains('active')) window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+        const wasActive = wrap.classList.contains('active');
         setActive(wrap);
+        // mobile: tapping the already-active menu toggles its tip; switching
+        // to another menu just changes the tab and hides the tip
+        if (headerMobileQuery.matches) {
+          document.body.classList.toggle('mobile-tip-open', wasActive && !document.body.classList.contains('mobile-tip-open'));
+        }
       });
     });
 
@@ -963,21 +1064,18 @@
       applyContent(initialActive);
       updateVideoFab(initialActive);
       scrollActiveIntoView(initialActive, false);
-      positionDesktopTip(initialActive);
       positionMobileTip(initialActive);
       // re-run once fonts/layout have fully settled, in case web font
       // loading shifted tab widths after the first measurement
       if (document.fonts && document.fonts.ready) {
         document.fonts.ready.then(() => {
           scrollActiveIntoView(initialActive, false);
-          positionDesktopTip(initialActive);
-          positionMobileTip(initialActive);
+              positionMobileTip(initialActive);
         });
       }
       window.addEventListener('load', () => {
         scrollActiveIntoView(initialActive, false);
-        positionDesktopTip(initialActive);
-        positionMobileTip(initialActive);
+          positionMobileTip(initialActive);
       });
     }
 
@@ -990,7 +1088,6 @@
       const activeWrap = document.querySelector('.tab-wrap.active');
       if (activeWrap) {
         scrollActiveIntoView(activeWrap, false);
-        positionDesktopTip(activeWrap);
         positionMobileTip(activeWrap);
       }
       updateTipVisibility();
@@ -1008,8 +1105,7 @@
         const activeWrap = document.querySelector('.tab-wrap.active');
         if (activeWrap) {
           scrollActiveIntoView(activeWrap, false);
-          positionDesktopTip(activeWrap);
-          positionMobileTip(activeWrap);
+            positionMobileTip(activeWrap);
         }
       });
     });
@@ -1019,18 +1115,19 @@
     navMenu.addEventListener('scroll', () => {
       const activeWrap = document.querySelector('.tab-wrap.active');
       if (!activeWrap) return;
-      positionDesktopTip(activeWrap);
       positionMobileTip(activeWrap);
     }, { passive: true });
 
-    // mobile only: tip shows on load, disappears once the page scrolls down
+    // mobile only: the tip opens on menu tap and closes once the page scrolls
+    // down or anywhere outside the menu is tapped
     function updateTipVisibility() {
-      if (!headerMobileQuery.matches) {
-        document.body.classList.remove('tip-collapsed');
-        return;
+      if (!headerMobileQuery.matches || window.scrollY > 10) {
+        document.body.classList.remove('mobile-tip-open');
       }
-      document.body.classList.toggle('tip-collapsed', window.scrollY > 10);
     }
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.tab-wrap')) document.body.classList.remove('mobile-tip-open');
+    });
     window.addEventListener('scroll', updateTipVisibility, { passive: true });
     updateTipVisibility();
 

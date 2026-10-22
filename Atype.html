@@ -1,0 +1,1150 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>The-K 더 캐보자</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+<style>
+  :root {
+    --blue-primary: #21409a;
+    --blue-accent: #2853f6;
+    --blue-light: #e1ebff;
+    color-scheme: light;
+  }
+
+  * { box-sizing: border-box; }
+
+  /* never let anything (tips, fixed widgets, scrolled menus) widen the page sideways */
+  html, body { overflow-x: clip; }
+
+  body {
+    margin: 0;
+    font-family: "Pretendard", -apple-system, BlinkMacSystemFont, "Malgun Gothic", sans-serif;
+    background: #fff;
+    color: var(--blue-primary);
+  }
+
+  .page {
+    max-width: 1920px;
+    margin: 0 auto;
+  }
+
+  /* ---------- Header ---------- */
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: #fff;
+    width: 100%;
+  }
+
+  .gnb {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 50px min(160px, 8.3333vw);
+  }
+
+  .logo {
+    font-family: "Paperlogy", "Pretendard", sans-serif;
+    font-weight: 800;
+    font-size: 40px;
+    letter-spacing: -1.2px;
+    color: var(--blue-primary);
+    white-space: nowrap;
+    cursor: default;
+  }
+
+  /* flex-start (not center) so the scrollable range is always unambiguous —
+     .menu-track's auto margins below handle the "centered when it fits"
+     look, and once it overflows the row just scrolls normally from 0 */
+  nav.menu {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: flex-start;
+    height: 68px;
+    padding: 0 min(160px, 8.3333vw) 12px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+  }
+  nav.menu::-webkit-scrollbar { display: none; }
+
+  .menu-track {
+    display: flex;
+    align-items: center;
+    flex: none;
+    gap: 16px;
+    margin: 0 auto;
+  }
+
+  .tab-wrap {
+    position: relative;
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .tab-btn {
+    appearance: none;
+    border: none;
+    background: transparent;
+    font-family: inherit;
+    padding: 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .tab-btn:focus-visible {
+    outline: 2px solid var(--blue-accent);
+    outline-offset: 2px;
+  }
+
+  /* icon thumbnail (shared by inactive + active tabs) */
+  .tab-icon {
+    position: relative;
+    z-index: 3;
+    flex: none;
+    display: block;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    overflow: hidden;
+  }
+  /* icons are pre-cropped from Figma to fill the frame exactly
+     (assets/gnb/v2: icon-dN = desktop 40px, icon-mN = mobile 22px) */
+  .tab-icon picture { display: block; width: 100%; height: 100%; }
+  .tab-icon img {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  /* plain (inactive) tab: 2px #ebebeb outline, icon + label */
+  .tab-plain {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: 56px;
+    padding: 0 18px 0 6px;
+    border: 2px solid #ebebeb;
+    border-radius: 16px;
+    font-weight: 700;
+    font-size: 24px;
+    letter-spacing: -0.72px;
+    color: #999;
+    white-space: nowrap;
+    text-transform: uppercase;
+    transition: color 0.2s ease, border-color 0.2s ease;
+  }
+
+  /* hover = same color as the active (pill) state */
+  .tab-btn:hover .tab-plain {
+    color: var(--tab-color, var(--blue-accent));
+    border-color: color-mix(in srgb, var(--tab-color, var(--blue-accent)) 15%, #fff);
+  }
+
+  /* boxed (active) tab with scroll fill */
+  .tab-pill {
+    display: none;
+    position: relative;
+    overflow: hidden;
+    align-items: center;
+    gap: 8px;
+    background: color-mix(in srgb, var(--tab-color, var(--blue-accent)) 15%, #fff);
+    border-radius: 16px;
+    height: 56px;
+    padding: 0 20px 0 8px;
+    font-weight: 700;
+    font-size: 24px;
+    letter-spacing: -0.72px;
+  }
+
+  .tab-wrap.active .tab-plain { display: none; }
+  .tab-wrap.active .tab-pill { display: flex; }
+
+  .pill-label {
+    white-space: nowrap;
+    text-transform: uppercase;
+  }
+
+  .pill-label--base {
+    position: relative;
+    z-index: 1;
+    color: var(--tab-color, var(--blue-accent));
+  }
+
+  .pill-fill {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    padding-left: 56px;
+    background: var(--tab-color, var(--blue-accent));
+    color: #fff;
+    clip-path: inset(0 100% 0 0);
+    will-change: clip-path;
+    z-index: 2;
+  }
+
+  /* ---------- Speech bubble (desktop: shown while hovering a menu, left-aligned) ---------- */
+  .submenu {
+    display: none;
+    /* fixed + JS-computed left/bottom: nav.menu needs overflow-x:auto for
+       the no-wrap horizontal scroll, which forces overflow-y to clip too —
+       position:fixed is the only way for the tip to escape that clipping */
+    position: fixed;
+    flex-direction: column;
+    align-items: flex-start;
+    z-index: 10;
+  }
+
+  .tab-wrap.tip-open .submenu {
+    display: flex;
+    /* single drop-shadow around the whole bubble silhouette (box + tail) */
+    filter: drop-shadow(0px 8px 9.1px rgba(0, 0, 0, 0.22));
+  }
+
+  .submenu-box {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+    background: #fff;
+    border-radius: 16px;
+    white-space: nowrap;
+  }
+
+  .submenu-box a {
+    font-family: inherit;
+    font-weight: 500;
+    font-size: 16px;
+    letter-spacing: -0.48px;
+    color: var(--tab-color, var(--blue-accent));
+    text-decoration: none;
+    cursor: pointer;
+    transition: font-weight 0.15s ease;
+  }
+
+  .submenu-box a:hover {
+    font-weight: 700;
+  }
+
+  .submenu-arrow {
+    position: relative;
+    z-index: 1;
+    width: 348px;
+    height: 30px;
+    margin-top: -12px;
+  }
+
+  /* header07/header08 (rightmost tabs): tip hangs to the LEFT of the button
+     instead of the right, so the tail anchors to the box's right edge, not
+     its left — matches Figma's items-end layout for these two tips only */
+  .submenu--flip {
+    align-items: flex-end;
+  }
+
+  /* ---------- Mobile tip (shared banner, shown below the header) ---------- */
+  .mobile-tip {
+    display: none;
+  }
+
+
+  /* ---------- Footer (PC: 4,5,6,7,8편 / mobile: 4,5,7,8편) ---------- */
+  .site-footer { display: none; background: #f5f8fd; }
+  .site-footer.show-pc { display: block; }
+  .site-footer--mo { display: none; }
+
+  .site-footer--pc { padding: 60px 24px 96px; }
+  .footer-inner { width: min(1200px, 100%); margin: 0 auto; }
+  .footer-logo { position: relative; flex: none; display: block; }
+  .footer-logo img { position: absolute; display: block; max-width: none; }
+  .site-footer--pc .footer-logo { width: 385.51px; height: 34.26px; overflow: hidden; }
+  .site-footer--pc .footer-logo .l1 { inset: -0.03% 0 8.88% 20.3%; width: 79.7%; height: 91.15%; }
+  .site-footer--pc .footer-logo .l2 { inset: 15.94% 81.12% 0 0; width: 18.88%; height: 84.06%; }
+  .footer-top { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
+  .footer-links { display: flex; align-items: center; height: 52px; gap: 4px; }
+  .footer-links a { padding: 0 12px; font-weight: 500; font-size: 18px; color: #14181c; text-decoration: none; white-space: nowrap; }
+  .footer-links a.strong { font-weight: 700; }
+  .footer-divider { height: 1px; background: #666e75; opacity: 0.2; margin: 24px 0 32px; }
+  .footer-info { display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 8px 24px; line-height: normal; }
+  .footer-addr { margin: 0; font-weight: 400; font-size: 16px; color: #404549; }
+  .footer-copy { margin: 0; font-weight: 500; font-size: 15px; color: #666e75; opacity: 0.4; }
+
+  .site-footer--mo { padding: 32px 24px 60px; font-family: "Paperlogy", "Pretendard", sans-serif; }
+  .site-footer--mo .footer-inner { width: min(327px, 100%); }
+  .site-footer--mo .footer-logo { width: 240px; height: 21.329px; overflow: hidden; }
+  .site-footer--mo .footer-logo .l1 { inset: -0.04% 0 8.87% 20.3%; width: 79.7%; height: 91.17%; }
+  .site-footer--mo .footer-logo .l2 { inset: 15.93% 81.12% 0.01% 0; width: 18.88%; height: 84.06%; }
+  .footer-mo-links { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 9px; margin: 32px 0 18px; opacity: 0.7; }
+  .footer-mo-links a { font-weight: 700; font-size: 14px; line-height: 1.3; letter-spacing: -0.14px; color: #000; text-decoration: none; white-space: nowrap; }
+  .footer-mo-links i { width: 1px; height: 12px; background: #d8dce2; }
+  .site-footer--mo .footer-divider { margin: 0 0 28px; }
+  .footer-mo-addr { margin: 0 0 24px; font-weight: 700; font-size: 13px; line-height: 1.5; color: #000; opacity: 0.5; text-transform: uppercase; }
+  .footer-mo-copy { margin: 0; font-weight: 700; font-size: 11px; line-height: 1.5; color: #000; opacity: 0.3; text-transform: uppercase; }
+
+  @media (max-width: 768px) {
+    .site-footer.show-pc { display: none; }
+    .site-footer--mo.show-mo { display: block; }
+  }
+
+  /* ---------- 혜택마트 inline video ---------- */
+  .video-section {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 800px;
+    padding: 60px 24px;
+    background: #fff;
+  }
+  .video-section.active { display: flex; }
+  .video-section video {
+    display: block;
+    width: min(1200px, 100%);
+    aspect-ratio: 16 / 9;
+    background: #000;
+  }
+  @media (max-width: 768px) {
+    .video-section { min-height: 0; padding: 32px 0; }
+  }
+
+  /* ---------- Content ---------- */
+  main {
+    width: 100%;
+    line-height: 0;
+  }
+
+  .content-image {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .content-blank {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 800px;
+    background: #fff;
+  }
+
+  .content-blank span {
+    font-family: "Pretendard", sans-serif;
+    font-weight: 700;
+    font-size: 40px;
+    color: var(--blue-primary);
+    opacity: 0.4;
+  }
+
+  /* 복지혜택 mobile-only responsive frame: fixed-width foreground centered
+     over a background that fills the rest of the viewport and disappears
+     once the viewport narrows to the foreground's own width (375px) */
+  .benefit-frame {
+    display: none;
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+  }
+
+  .benefit-frame.active { display: block; }
+
+  .benefit-bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center top;
+    z-index: 0;
+  }
+
+  /* 벽돌깨기: PC foreground is the 377px "01" frame */
+  .future-frame picture { display: block; }
+  .future-frame .benefit-fg { width: 377px; }
+  @media (max-width: 768px) { .future-frame .benefit-fg { width: 375px; } }
+
+  .benefit-fg {
+    position: relative;
+    z-index: 1;
+    display: block;
+    width: 375px;
+    height: auto;
+    margin: 0 auto;
+  }
+
+  /* ---------- Floating "watch video" widget ---------- */
+  /* fixed to the viewport (not just sticky-with-header) so it stays
+     visible no matter how far the page is scrolled; positioned to match
+     the same right inset the GNB itself uses */
+  .video-fab {
+    display: none;
+    position: fixed;
+    top: 19px;
+    right: min(160px, 8.3333vw);
+    z-index: 200;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    cursor: pointer;
+    border: none;
+    background: none;
+    padding: 0;
+  }
+  .video-fab.active { display: flex; }
+
+  .video-fab-circle {
+    display: block;
+    position: relative;
+    width: 96px;
+    height: 96px;
+    border-radius: 999px;
+    background: #0f68ee;
+    overflow: hidden;
+  }
+  /* per-tab position/size is set inline via JS (data-fab-img-style),
+     matching each image's own custom crop in Figma — they're not all the
+     same size/offset within the 96px circle */
+  .video-fab-circle img,
+  .video-fab-circle video {
+    display: block;
+    object-fit: cover;
+    pointer-events: none;
+  }
+
+  .video-fab-tip {
+    margin-top: -24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    filter: drop-shadow(0px 6px 6.825px rgba(0, 0, 0, 0.22));
+  }
+  .video-fab-tail {
+    display: block;
+    width: 91px;
+    height: 22px;
+    margin-bottom: -9px;
+    transform: rotate(180deg);
+    position: relative;
+    z-index: 1;
+  }
+  .video-fab-pill {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    background: #fff;
+    border-radius: 12px;
+    padding: 6px 12px;
+    white-space: nowrap;
+    font-family: "Pretendard", sans-serif;
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: -0.36px;
+    color: var(--blue-accent);
+    text-transform: uppercase;
+  }
+  .video-fab-icon { width: 14px; height: 14px; flex: none; margin-right: 2px; }
+  .video-fab-play {
+    width: 10px;
+    height: 8px;
+    transform: rotate(90deg);
+    flex: none;
+  }
+
+
+  /* header mobile layout, same breakpoint as the content swap (768px) */
+  @media (max-width: 768px) {
+    header { box-shadow: 0px 4px 5px rgba(0, 0, 0, 0.15); }
+
+    /* 96px * 0.625 = 60px circle on mobile */
+    .video-fab { top: 24px; right: 15px; transform: scale(0.625); transform-origin: top right; }
+    .video-fab-tip { display: none; }
+
+    .gnb { padding: 40px 20px 24px 24px; }
+    .logo { font-size: 25px; letter-spacing: -0.76px; }
+
+    nav.menu {
+      flex-wrap: nowrap;
+      justify-content: flex-start;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      height: 38px;
+      padding: 0 10px 8px;
+    }
+    nav.menu::-webkit-scrollbar { display: none; }
+    .menu-track { gap: 4px; margin: 0; }
+
+    /* Figma mobile GNB: inactive = 30px icon-only square, active = icon + label */
+    .tab-plain {
+      width: 30px;
+      height: 30px;
+      justify-content: center;
+      gap: 0;
+      padding: 0;
+      border: 1px solid #ebebeb;
+      border-radius: 10px;
+      background: #fff;
+    }
+    .tab-text { display: none; }
+    .tab-pill { height: 30px; gap: 4px; padding: 0 8px 0 4px; border-radius: 10px; font-size: 12px; letter-spacing: -0.36px; }
+    .tab-icon { width: 22px; height: 22px; }
+    .pill-fill { padding-left: 30px; }
+
+    /* per-tab desktop tip lives inside the horizontally-scrolling nav —
+       hide it and show the shared .mobile-tip banner below instead.
+       (must match .tab-wrap.active .submenu's specificity to actually win) */
+    .tab-wrap.tip-open .submenu { display: none; }
+
+    .mobile-tip {
+      display: flex;
+      position: absolute;
+      left: 24px;
+      /* Figma: tip top sits at y=120 within the mobile header */
+      top: 120px;
+      flex-direction: column-reverse;
+      align-items: flex-start;
+      z-index: 10;
+      /* the tip overlaps the menu row, so it must not swallow touches/drags
+         meant for the horizontally scrolling menu underneath */
+      pointer-events: none;
+      /* shown only after a menu tap (body.mobile-tip-open) */
+      opacity: 0;
+      filter: drop-shadow(0px 4px 7.5px rgba(0, 0, 0, 0.15));
+      transition: opacity 0.3s ease;
+    }
+    body.mobile-tip-open .mobile-tip { opacity: 1; }
+
+    .mobile-tip .submenu-box {
+      margin-top: -10px;
+      gap: 12px;
+      padding: 10px 12px;
+      border-radius: 12px;
+    }
+    .mobile-tip .submenu-box a { font-size: 12px; letter-spacing: -0.36px; }
+
+    .mobile-tip-arrow {
+      width: 262px;
+      height: 22px;
+      transform: scaleY(-1);
+    }
+  }
+</style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <div class="gnb">
+        <span class="logo">The-K 더 캐보자</span>
+      </div>
+      <nav class="menu" id="navMenu">
+       <div class="menu-track">
+        <div class="tab-wrap" data-key="firstpay" data-tab-color="#FF2465" data-content="assets/content-firstpay-v2.jpg" data-content-mobile="assets/content-firstpay-mobile.jpg" data-fab-bg="#FF5285" data-fab-color="#FF5285" data-fab-type="video" data-fab-media="assets/1편.mp4" data-fab-img-style="width:100%;height:100%;left:0;top:0;">
+          <button class="tab-btn" type="button">
+            <span class="tab-plain"><span class="tab-icon"><picture><source media="(max-width: 768px)" srcset="assets/gnb/a/icon-m1.png" /><img src="assets/gnb/a/icon-d1.png" alt="" /></picture></span><span class="tab-text">장기저축급여</span></span>
+            <span class="tab-pill">
+              <span class="tab-icon"><picture><source media="(max-width: 768px)" srcset="assets/gnb/a/icon-m1.png" /><img src="assets/gnb/a/icon-d1.png" alt="" /></picture></span><span class="pill-label pill-label--base">EP.01 장기저축급여</span>
+              <span class="pill-fill" aria-hidden="true"><span class="pill-label">EP.01 장기저축급여</span></span>
+            </span>
+          </button>
+          <div class="submenu">
+            <div class="submenu-box">
+              <a href="#">#장기저축급여</a>
+              <a href="#">#월급관리</a>
+              <a href="#">#평생월급</a>
+              <a href="#">#복리마법</a>
+            </div>
+            <svg class="submenu-arrow" viewBox="0 0 348 30" preserveAspectRatio="xMidYMin meet" xmlns="http://www.w3.org/2000/svg">
+              <path d="M32.5359 24C34.0755 26.6667 37.9245 26.6667 39.4641 24L45.5263 13.5C47.0659 10.8333 45.1414 7.5 42.0622 7.5H29.9378C26.8586 7.5 24.9341 10.8333 26.4737 13.5L32.5359 24Z" fill="white"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="tab-wrap" data-key="retire" data-content="assets/content-retire-v2.jpg" data-content-mobile="assets/content-retire-mobile.jpg" data-fab-bg="#0F68EE" data-fab-color="#2853F6" data-fab-type="video" data-fab-media="assets/2편.mp4" data-fab-img-style="width:100%;height:100%;left:0;top:0;">
+          <button class="tab-btn" type="button">
+            <span class="tab-plain"><span class="tab-icon"><picture><source media="(max-width: 768px)" srcset="assets/gnb/a/icon-m2.png" /><img src="assets/gnb/a/icon-d2.png" alt="" /></picture></span><span class="tab-text">분할급여금</span></span>
+            <span class="tab-pill">
+              <span class="tab-icon"><picture><source media="(max-width: 768px)" srcset="assets/gnb/a/icon-m2.png" /><img src="assets/gnb/a/icon-d2.png" alt="" /></picture></span><span class="pill-label pill-label--base">EP.02 분할급여금</span>
+              <span class="pill-fill" aria-hidden="true"><span class="pill-label">EP.02 분할급여금</span></span>
+            </span>
+          </button>
+          <div class="submenu">
+            <div class="submenu-box">
+              <a href="#">#퇴직후생활비</a>
+              <a href="#">#퇴직급여금수령방법</a>
+              <a href="#">#장기저축급여_퇴직급여금</a>
+              <a href="#">#일시금vs분할</a>
+            </div>
+            <svg class="submenu-arrow" viewBox="0 0 348 30" preserveAspectRatio="xMidYMin meet" xmlns="http://www.w3.org/2000/svg">
+              <path d="M32.5359 24C34.0755 26.6667 37.9245 26.6667 39.4641 24L45.5263 13.5C47.0659 10.8333 45.1414 7.5 42.0622 7.5H29.9378C26.8586 7.5 24.9341 10.8333 26.4737 13.5L32.5359 24Z" fill="white"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="tab-wrap" data-key="deposit" data-content="assets/content-deposit-v2.jpg" data-content-mobile="assets/content-deposit-mobile.jpg" data-fab-bg="#8D3BFF" data-fab-color="#8D3BFF" data-fab-type="video" data-fab-media="assets/3편.mp4" data-fab-img-style="width:100%;height:100%;left:0;top:0;">
+          <button class="tab-btn" type="button">
+            <span class="tab-plain"><span class="tab-icon"><picture><source media="(max-width: 768px)" srcset="assets/gnb/a/icon-m3.png" /><img src="assets/gnb/a/icon-d3.png" alt="" /></picture></span><span class="tab-text">증좌</span></span>
+            <span class="tab-pill">
+              <span class="tab-icon"><picture><source media="(max-width: 768px)" srcset="assets/gnb/a/icon-m3.png" /><img src="assets/gnb/a/icon-d3.png" alt="" /></picture></span><span class="pill-label pill-label--base">EP.03 증좌</span>
+              <span class="pill-fill" aria-hidden="true"><span class="pill-label">EP.03 증좌</span></span>
+            </span>
+          </button>
+          <div class="submenu">
+            <div class="submenu-box">
+              <a href="#">#장기저축급여</a>
+              <a href="#">#급여율5.0%</a>
+              <a href="#">#급여율인상</a>
+              <a href="#">#증좌신청</a>
+            </div>
+            <svg class="submenu-arrow" viewBox="0 0 348 30" preserveAspectRatio="xMidYMin meet" xmlns="http://www.w3.org/2000/svg">
+              <path d="M32.5359 24C34.0755 26.6667 37.9245 26.6667 39.4641 24L45.5263 13.5C47.0659 10.8333 45.1414 7.5 42.0622 7.5H29.9378C26.8586 7.5 24.9341 10.8333 26.4737 13.5L32.5359 24Z" fill="white"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="tab-wrap active" data-key="benefit" data-fab-label="장바구니 담으러 가기" data-fab-icon="assets/gnb/v2/icon-bag.svg" data-content="assets/content.jpg" data-fab-bg="#0F68EE" data-fab-color="#2853F6" data-fab-type="video" data-fab-media="assets/4편.mp4" data-fab-img-style="width:86px;height:86px;left:50%;top:calc(50% + 2px);transform:translate(-50%,-50%);">
+          <button class="tab-btn" type="button">
+            <span class="tab-plain"><span class="tab-icon"><picture><source media="(max-width: 768px)" srcset="assets/gnb/a/icon-m4.png" /><img src="assets/gnb/a/icon-d4.png" alt="" /></picture></span><span class="tab-text">복지혜택</span></span>
+            <span class="tab-pill">
+              <span class="tab-icon"><picture><source media="(max-width: 768px)" srcset="assets/gnb/a/icon-m4.png" /><img src="assets/gnb/a/icon-d4.png" alt="" /></picture></span><span class="pill-label pill-label--base">EP.04 복지혜택</span>
+              <span class="pill-fill" aria-hidden="true"><span class="pill-label">EP.04 복지혜택</span></span>
+            </span>
+          </button>
+          <div class="submenu">
+            <div class="submenu-box">
+              <a href="#">#복지혜택</a>
+              <a href="#">#이벤트혜택</a>
+              <a href="#">#회원복지</a>
+              <a href="#">#복지알림</a>
+            </div>
+            <svg class="submenu-arrow" viewBox="0 0 348 30" preserveAspectRatio="xMidYMin meet" xmlns="http://www.w3.org/2000/svg">
+              <path d="M32.5359 24C34.0755 26.6667 37.9245 26.6667 39.4641 24L45.5263 13.5C47.0659 10.8333 45.1414 7.5 42.0622 7.5H29.9378C26.8586 7.5 24.9341 10.8333 26.4737 13.5L32.5359 24Z" fill="white"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="tab-wrap" data-key="future" data-content="" data-blank-color="#E8F5E9" data-fab-bg="#2E9E44" data-fab-color="#2E9E44" data-fab-type="image" data-fab-media="assets/fab-blank-v2.png" data-fab-img-style="width:64px;height:64px;left:50%;top:50%;transform:translate(-50%,-50%);">
+          <button class="tab-btn" type="button">
+            <span class="tab-plain"><span class="tab-icon"><picture><source media="(max-width: 768px)" srcset="assets/gnb/a/icon-m5.png" /><img src="assets/gnb/a/icon-d5.png" alt="" /></picture></span><span class="tab-text">혜택마트</span></span>
+            <span class="tab-pill">
+              <span class="tab-icon"><picture><source media="(max-width: 768px)" srcset="assets/gnb/a/icon-m5.png" /><img src="assets/gnb/a/icon-d5.png" alt="" /></picture></span><span class="pill-label pill-label--base">EP.05 혜택마트</span>
+              <span class="pill-fill" aria-hidden="true"><span class="pill-label">EP.05 혜택마트</span></span>
+            </span>
+          </button>
+          <div class="submenu">
+            <div class="submenu-box">
+              <a href="#">#미래자산</a>
+              <a href="#">#자산포트폴리오</a>
+              <a href="#">#맞춤형금융설계</a>
+              <a href="#">#스마트재테크</a>
+            </div>
+            <svg class="submenu-arrow" viewBox="0 0 348 30" preserveAspectRatio="xMidYMin meet" xmlns="http://www.w3.org/2000/svg">
+              <path d="M32.5359 24C34.0755 26.6667 37.9245 26.6667 39.4641 24L45.5263 13.5C47.0659 10.8333 45.1414 7.5 42.0622 7.5H29.9378C26.8586 7.5 24.9341 10.8333 26.4737 13.5L32.5359 24Z" fill="white"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="tab-wrap" data-key="lowtax" data-content="" data-blank-color="#FFF9E6" data-fab-bg="#E6A700" data-fab-color="#E6A700" data-fab-type="image" data-fab-media="assets/fab-blank-v2.png" data-fab-img-style="width:64px;height:64px;left:50%;top:50%;transform:translate(-50%,-50%);">
+          <button class="tab-btn" type="button">
+            <span class="tab-plain"><span class="tab-icon"><picture><source media="(max-width: 768px)" srcset="assets/gnb/a/icon-m6.png" /><img src="assets/gnb/a/icon-d6.png" alt="" /></picture></span><span class="tab-text">벽돌깨기</span></span>
+            <span class="tab-pill">
+              <span class="tab-icon"><picture><source media="(max-width: 768px)" srcset="assets/gnb/a/icon-m6.png" /><img src="assets/gnb/a/icon-d6.png" alt="" /></picture></span><span class="pill-label pill-label--base">EP.06 벽돌깨기</span>
+              <span class="pill-fill" aria-hidden="true"><span class="pill-label">EP.06 벽돌깨기</span></span>
+            </span>
+          </button>
+          <div class="submenu">
+            <div class="submenu-box">
+              <a href="#">#벽돌깨기</a>
+              <a href="#">#게임참여</a>
+              <a href="#">#경품받기</a>
+              <a href="#">#더케이오락실</a>
+            </div>
+            <svg class="submenu-arrow" viewBox="0 0 348 30" preserveAspectRatio="xMidYMin meet" xmlns="http://www.w3.org/2000/svg">
+              <path d="M32.5359 24C34.0755 26.6667 37.9245 26.6667 39.4641 24L45.5263 13.5C47.0659 10.8333 45.1414 7.5 42.0622 7.5H29.9378C26.8586 7.5 24.9341 10.8333 26.4737 13.5L32.5359 24Z" fill="white"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="tab-wrap" data-key="deduction" data-content="" data-blank-color="#F3E8FF" data-fab-bg="#8D3BFF" data-fab-color="#8D3BFF" data-fab-type="image" data-fab-media="assets/fab-blank-v2.png" data-fab-img-style="width:64px;height:64px;left:50%;top:50%;transform:translate(-50%,-50%);">
+          <button class="tab-btn" type="button">
+            <span class="tab-plain"><span class="tab-icon"><picture><source media="(max-width: 768px)" srcset="assets/gnb/a/icon-m7.png" /><img src="assets/gnb/a/icon-d7.png" alt="" /></picture></span><span class="tab-text">증좌 2편</span></span>
+            <span class="tab-pill">
+              <span class="tab-icon"><picture><source media="(max-width: 768px)" srcset="assets/gnb/a/icon-m7.png" /><img src="assets/gnb/a/icon-d7.png" alt="" /></picture></span><span class="pill-label pill-label--base">EP.07 증좌 2편</span>
+              <span class="pill-fill" aria-hidden="true"><span class="pill-label">EP.07 증좌 2편</span></span>
+            </span>
+          </button>
+          <div class="submenu submenu--flip">
+            <div class="submenu-box">
+              <a href="#">#급여공제저축</a>
+              <a href="#">#선저축후지출</a>
+              <a href="#">#쉬운목돈만들기</a>
+              <a href="#">#부담없는소액저축</a>
+            </div>
+            <svg class="submenu-arrow" viewBox="0 0 348 30" preserveAspectRatio="xMidYMin meet" xmlns="http://www.w3.org/2000/svg">
+              <path d="M315.4641 24C313.9245 26.6667 310.0755 26.6667 308.5359 24L302.4737 13.5C300.9341 10.8333 302.8586 7.5 305.9378 7.5H318.0622C321.1414 7.5 323.0659 10.8333 321.5263 13.5L315.4641 24Z" fill="white"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="tab-wrap" data-key="yearend" data-content="" data-blank-color="#FFF0E0" data-fab-bg="#FF7A00" data-fab-color="#FF7A00" data-fab-type="image" data-fab-media="assets/fab-blank-v2.png" data-fab-img-style="width:64px;height:64px;left:50%;top:50%;transform:translate(-50%,-50%);">
+          <button class="tab-btn" type="button">
+            <span class="tab-plain"><span class="tab-icon"><picture><source media="(max-width: 768px)" srcset="assets/gnb/a/icon-m8.png" /><img src="assets/gnb/a/icon-d8.png" alt="" /></picture></span><span class="tab-text">분할급여금 2편</span></span>
+            <span class="tab-pill">
+              <span class="tab-icon"><picture><source media="(max-width: 768px)" srcset="assets/gnb/a/icon-m8.png" /><img src="assets/gnb/a/icon-d8.png" alt="" /></picture></span><span class="pill-label pill-label--base">EP.08 분할급여금 2편</span>
+              <span class="pill-fill" aria-hidden="true"><span class="pill-label">EP.08 분할급여금 2편</span></span>
+            </span>
+          </button>
+          <div class="submenu submenu--flip">
+            <div class="submenu-box">
+              <a href="#">#연말정산대비</a>
+              <a href="#">#스마트한절세</a>
+              <a href="#">#퇴직급여금조회</a>
+              <a href="#">#내년재무목표</a>
+            </div>
+            <svg class="submenu-arrow" viewBox="0 0 348 30" preserveAspectRatio="xMidYMin meet" xmlns="http://www.w3.org/2000/svg">
+              <path d="M315.4641 24C313.9245 26.6667 310.0755 26.6667 308.5359 24L302.4737 13.5C300.9341 10.8333 302.8586 7.5 305.9378 7.5H318.0622C321.1414 7.5 323.0659 10.8333 321.5263 13.5L315.4641 24Z" fill="white"/>
+            </svg>
+          </div>
+        </div>
+       </div>
+      </nav>
+
+      <div class="mobile-tip" id="mobileTip">
+        <div class="submenu-box" id="mobileTipBox">
+          <a href="#">#복지혜택</a>
+          <a href="#">#이벤트혜택</a>
+          <a href="#">#회원복지</a>
+          <a href="#">#복지알림</a>
+        </div>
+        <svg class="mobile-tip-arrow" viewBox="0 0 262 22" preserveAspectRatio="xMidYMin meet" xmlns="http://www.w3.org/2000/svg">
+          <path d="M28.4019 17.5C29.5566 19.5 32.4434 19.5 33.5981 17.5L37.0622 11.5C38.2169 9.5 36.7735 7 34.4641 7H27.5359C25.2265 7 23.7831 9.5 24.9378 11.5L28.4019 17.5Z" fill="white"/>
+        </svg>
+      </div>
+    </header>
+
+    <a class="video-fab" id="videoFab" href="#" onclick="return false" aria-label="영상 보러가기">
+      <span class="video-fab-circle" id="videoFabCircle"></span>
+      <span class="video-fab-tip">
+        <svg class="video-fab-tail" viewBox="0 0 91 22" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M24.4019 18C25.5566 20 28.4434 20 29.5981 18L34.1447 10.125C35.2994 8.125 33.856 5.625 31.5466 5.625H22.4534C20.144 5.625 18.7006 8.125 19.8553 10.125L24.4019 18Z" fill="white"/>
+        </svg>
+        <span class="video-fab-pill" id="videoFabPill">
+          <svg class="video-fab-play" viewBox="0 0 9.73665 7.72128" xmlns="http://www.w3.org/2000/svg">
+            <path d="M3.28352 0.780011C4.08412 -0.260004 5.65253 -0.260004 6.45314 0.780012L9.31778 4.50129C10.3302 5.81643 9.39265 7.72128 7.73297 7.72128H2.00368C0.344003 7.72128 -0.593522 5.81643 0.418872 4.50129L3.28352 0.780011Z" fill="currentColor"/>
+          </svg>
+          영상 보러가기
+        </span>
+      </span>
+    </a>
+
+
+    <main>
+      <img class="content-image" id="contentImage" src="assets/content.jpg" alt="The-K 더 캐보자 콘텐츠" />
+
+      <!-- 복지혜택 mobile only: fixed 375px-wide content over a full-width
+           background that shrinks with the viewport and is fully hidden
+           behind the content once the viewport reaches 375px -->
+      <!-- 벽돌깨기 (6편): background shrinks with the viewport, the 377px
+           "01" frame stays fixed, then swaps to the 375px mobile frame -->
+      <!-- 혜택마트 (5편): inline video in the content area -->
+      <section class="video-section" id="videoSection">
+        <video id="martVideo" src="assets/The-K 혜택마트-1분 30초_최종.mp4" controls playsinline preload="metadata"></video>
+      </section>
+
+      <div class="benefit-frame future-frame" id="futureFrame">
+        <img class="benefit-bg" src="assets/content-future-bg.png" alt="" aria-hidden="true" />
+        <picture>
+          <source media="(max-width: 768px)" srcset="assets/content-future-fg-mobile.png" />
+          <img class="benefit-fg" src="assets/content-future-fg-pc.png" alt="The-K 더 캐보자 벽돌깨기" />
+        </picture>
+      </div>
+
+      <div class="benefit-frame" id="benefitFrame">
+        <img class="benefit-bg" src="assets/benefit-bg-mobile.jpg" alt="" aria-hidden="true" />
+        <img class="benefit-fg" src="assets/benefit-fg-mobile.jpg" alt="The-K 더 캐보자 복지혜택" />
+      </div>
+    </main>
+
+    <footer class="site-footer site-footer--pc" id="footerPc">
+      <div class="footer-inner">
+        <div class="footer-top">
+          <span class="footer-logo" role="img" aria-label="The-K 한국교직원공제회">
+            <img class="l1" src="assets/footer/logo-pc-1.svg" alt="" />
+            <img class="l2" src="assets/footer/logo-pc-2.svg" alt="" />
+          </span>
+          <nav class="footer-links">
+            <a href="#">일반신고</a><a href="#">부패공익신고</a><a href="#" class="strong">개인정보처리방침</a><a href="#">이용약관</a>
+          </nav>
+        </div>
+        <div class="footer-divider"></div>
+        <div class="footer-info">
+          <p class="footer-addr">07328 서울 영등포구 여의나루로 50 The-K한국교직원공제회</p>
+          <p class="footer-copy">Copyright©2026 KTCU. ALL RIGHTS RESERVED.</p>
+        </div>
+      </div>
+    </footer>
+
+    <footer class="site-footer site-footer--mo" id="footerMo">
+      <div class="footer-inner">
+        <span class="footer-logo" role="img" aria-label="The-K 한국교직원공제회">
+          <img class="l1" src="assets/footer/logo-mo-1.svg" alt="" />
+          <img class="l2" src="assets/footer/logo-mo-2.svg" alt="" />
+        </span>
+        <div class="footer-mo-links">
+          <a href="#">일반신고</a><i></i><a href="#">부패공익신고</a><i></i><a href="#">개인정보처리방침</a><i></i><a href="#">이용약관</a>
+        </div>
+        <div class="footer-divider"></div>
+        <p class="footer-mo-addr">07328 서울 영등포구 여의나루로 50<br />The-K한국교직원공제회</p>
+        <p class="footer-mo-copy">Copyright©2026 KTCU.&nbsp; ALL RIGHTS RESERVED.</p>
+      </div>
+    </footer>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/ScrollTrigger.min.js"></script>
+  <script>
+    const tabWraps = document.querySelectorAll('.tab-wrap');
+    // each tab's fill/text color = its floating widget's text color
+    tabWraps.forEach((w) => { const c = w.dataset.tabColor || w.dataset.fabColor; if (c) w.style.setProperty('--tab-color', c); });
+    const contentImage = document.getElementById('contentImage');
+    const benefitFrame = document.getElementById('benefitFrame');
+    const futureFrame = document.getElementById('futureFrame');
+    const videoSection = document.getElementById('videoSection');
+    const martVideo = document.getElementById('martVideo');
+    // content images (firstpay/retire/deposit) keep swapping at 768px
+    const contentMobileQuery = window.matchMedia('(max-width: 768px)');
+    // header mobile layout uses the same 768px breakpoint
+    const headerMobileQuery = window.matchMedia('(max-width: 768px)');
+
+    // footer visibility per tab (4,5,6,7,8편 on PC; 4,5,7,8편 on mobile —
+    // the 6편 mobile frame already includes its own footer)
+    const footerPc = document.getElementById('footerPc');
+    const footerMo = document.getElementById('footerMo');
+    const FOOTER_PC = ['benefit', 'future', 'lowtax', 'deduction', 'yearend'];
+    const FOOTER_MO = ['benefit', 'future', 'deduction', 'yearend'];
+
+    function applyContent(wrap) {
+      footerPc.classList.toggle('show-pc', FOOTER_PC.includes(wrap.dataset.key));
+      footerMo.classList.toggle('show-mo', FOOTER_MO.includes(wrap.dataset.key));
+      // 복지혜택 always gets the fixed-375px-foreground + shrinking-background
+      // treatment instead of the plain swapped <img>, at every width
+      const useBenefitFrame = wrap.dataset.key === 'benefit';
+      const useVideo = wrap.dataset.key === 'future';
+      videoSection.classList.toggle('active', useVideo);
+      if (!useVideo) martVideo.pause();
+      const useFutureFrame = wrap.dataset.key === 'lowtax';
+      benefitFrame.classList.toggle('active', useBenefitFrame);
+      futureFrame.classList.toggle('active', useFutureFrame);
+
+      if (useVideo) {
+        contentImage.style.display = 'none';
+        const blank = document.getElementById('contentBlank');
+        if (blank) blank.style.display = 'none';
+        benefitFrame.classList.remove('active');
+        futureFrame.classList.remove('active');
+        return;
+      }
+
+      if (useBenefitFrame || useFutureFrame) {
+        contentImage.style.display = 'none';
+        const existingBlank = document.getElementById('contentBlank');
+        if (existingBlank) existingBlank.style.display = 'none';
+        return;
+      }
+
+      const src = (contentMobileQuery.matches && wrap.dataset.contentMobile)
+        ? wrap.dataset.contentMobile
+        : wrap.dataset.content;
+
+      if (src) {
+        contentImage.src = src;
+        contentImage.style.display = '';
+      } else {
+        contentImage.style.display = 'none';
+        let blank = document.getElementById('contentBlank');
+        if (!blank) {
+          blank = document.createElement('div');
+          blank.id = 'contentBlank';
+          blank.className = 'content-blank';
+          blank.innerHTML = '<span>콘텐츠 영역</span>';
+          contentImage.insertAdjacentElement('afterend', blank);
+        }
+        blank.style.background = wrap.dataset.blankColor || '#fff';
+        blank.style.display = 'flex';
+      }
+
+      const existingBlank = document.getElementById('contentBlank');
+      if (src && existingBlank) existingBlank.style.display = 'none';
+    }
+
+    const mobileTipBox = document.getElementById('mobileTipBox');
+    const navMenu = document.getElementById('navMenu');
+
+    // mobile: always scroll the active box to x:24, the same left inset
+    // the nav uses for its very first item.
+    // desktop (narrowed, still centered): leave the centered scroll position
+    // alone as long as the box is visible, and only snap it to x:24 once
+    // it would otherwise be scrolled out of view.
+    function scrollActiveIntoView(wrap, smooth) {
+      const navRect = navMenu.getBoundingClientRect();
+      const wrapRect = wrap.getBoundingClientRect();
+
+      if (!headerMobileQuery.matches) {
+        // .menu-track's auto margins already center it when everything
+        // fits, and nav.menu is flex-start so the scroll range is always
+        // unambiguous — only step in once the box is actually clipped, and
+        // never touch scrollLeft otherwise (so a manual left-scroll to see
+        // the earlier tabs is never fought or reset)
+        const visible = wrapRect.left >= navRect.left - 0.5 && wrapRect.right <= navRect.right + 0.5;
+        if (visible) return;
+      }
+
+      const delta = wrapRect.left - navRect.left;
+      const target = Math.max(0, navMenu.scrollLeft + delta - 24);
+      navMenu.scrollTo({ left: target, behavior: smooth ? 'smooth' : 'auto' });
+    }
+
+    // desktop: the tip is position:fixed (to escape nav.menu's forced
+    // overflow clipping), so its left/top have to be computed in JS against
+    // the active tab's actual on-screen position. In Figma the tip frame's
+    // top sits 58px above the box's top (tip top=89 vs box top=147 within
+    // the 215px header) — using `top` directly avoids innerHeight math.
+    function positionDesktopTip(wrap) {
+      const submenu = wrap.querySelector('.submenu');
+      if (!submenu) return;
+      const btnRect = wrap.querySelector('.tab-btn').getBoundingClientRect();
+      const flipped = submenu.classList.contains('submenu--flip');
+      submenu.style.bottom = 'auto';
+      submenu.style.top = (btnRect.top - 58) + 'px';
+
+      if (flipped) {
+        // header07/08: box hangs to the LEFT of the button (tail anchors to
+        // the box's right edge — see .submenu--flip), so align that right
+        // edge with the button's right edge instead of matching left edges
+        const tipWidth = submenu.getBoundingClientRect().width;
+        submenu.style.left = (btnRect.right - tipWidth) + 'px';
+      } else {
+        submenu.style.left = btnRect.left + 'px';
+      }
+
+      // the last couple of tabs' tips would otherwise land straight under
+      // the floating video widget's corner — pull the tip left just enough
+      // to clear it (and the raw viewport edge) instead of overflowing/
+      // colliding with it
+      const tipRect = submenu.getBoundingClientRect();
+      const rightInset = Math.min(160, window.innerWidth * 0.083333);
+      const fabLeftEdge = window.innerWidth - rightInset - 96;
+      const maxRight = fabLeftEdge - 16;
+      if (tipRect.right > maxRight) {
+        const shifted = Math.max(16, maxRight - tipRect.width);
+        submenu.style.left = shifted + 'px';
+      }
+    }
+
+    // desktop: right-clicking a menu (any tab, not just the active one) opens
+    // its tip; it closes on any outside click, Esc, scroll or resize
+    function closeDesktopTips() {
+      tabWraps.forEach((w) => w.classList.remove('tip-open'));
+    }
+    tabWraps.forEach((wrap) => {
+      wrap.querySelector('.tab-btn').addEventListener('contextmenu', (e) => {
+        if (headerMobileQuery.matches) return;
+        e.preventDefault();
+        closeDesktopTips();
+        wrap.classList.add('tip-open');
+        positionDesktopTip(wrap);
+      });
+    });
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.submenu')) closeDesktopTips();
+    });
+    document.addEventListener('contextmenu', (e) => {
+      if (!e.target.closest('.tab-btn')) closeDesktopTips();
+    });
+    window.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeDesktopTips(); });
+    window.addEventListener('scroll', closeDesktopTips, { passive: true });
+    window.addEventListener('resize', closeDesktopTips);
+
+    // mobile: the tip banner defaults to left:24px in CSS (matching where
+    // the box is scrolled to), but compute it from the box's actual
+    // position instead so it always lines up even in edge cases (e.g. the
+    // last tab, which may not have room to scroll all the way to x:24)
+    const mobileTip = document.getElementById('mobileTip');
+    const headerEl = document.querySelector('header');
+    function positionMobileTip(wrap) {
+      const headerRect = headerEl.getBoundingClientRect();
+      const btnRect = wrap.querySelector('.tab-pill').getBoundingClientRect();
+      // follows its tab exactly while the menu scrolls (any overflow past the
+      // viewport edge is clipped by html/body overflow-x: clip)
+      mobileTip.style.left = (btnRect.left - headerRect.left) + 'px';
+      // the mobile tip lives outside .tab-wrap, so carry the tab color over
+      const c = wrap.dataset.tabColor || wrap.dataset.fabColor;
+      if (c) mobileTip.style.setProperty('--tab-color', c);
+    }
+
+    // floating "watch video" widget: swaps circle bg/media/text color per
+    // tab, and hides entirely on tabs that don't define one
+    const videoFab = document.getElementById('videoFab');
+    const videoFabCircle = document.getElementById('videoFabCircle');
+    const videoFabPill = document.getElementById('videoFabPill');
+    const defaultPillHTML = videoFabPill.innerHTML;
+    function updateVideoFab(wrap) {
+      const media = wrap.dataset.fabMedia;
+      if (!media) {
+        videoFab.classList.remove('active');
+        videoFabCircle.innerHTML = '';
+        return;
+      }
+      videoFab.classList.add('active');
+      videoFabCircle.style.background = wrap.dataset.fabBg || '#0f68ee';
+      videoFabPill.style.color = wrap.dataset.fabColor || '#2853f6';
+      // per-tab label/icon (4편: 장바구니), default is the play icon + 영상 보러가기
+      videoFabPill.innerHTML = wrap.dataset.fabLabel
+        ? (wrap.dataset.fabIcon ? '<img class="video-fab-icon" src="' + wrap.dataset.fabIcon + '" alt="" />' : '') + wrap.dataset.fabLabel
+        : defaultPillHTML;
+      const imgStyle = 'position:absolute;' + (wrap.dataset.fabImgStyle || '');
+      videoFabCircle.innerHTML = wrap.dataset.fabType === 'video'
+        ? '<video src="' + media + '" style="' + imgStyle + '" autoplay muted loop playsinline></video>'
+        : '<img src="' + media + '" alt="" style="' + imgStyle + '" />';
+    }
+
+
+    // pause the fab's video while the page is scrolled, resume once back
+    // at the top
+    window.addEventListener('scroll', () => {
+      const video = videoFabCircle.querySelector('video');
+      if (!video) return;
+      if (window.scrollY > 10) {
+        video.pause();
+      } else if (video.paused) {
+        video.play().catch(() => {});
+      }
+    }, { passive: true });
+
+    function setActive(wrap, opts) {
+      tabWraps.forEach((w) => w.classList.remove('active'));
+      wrap.classList.add('active');
+      applyContent(wrap);
+      updateVideoFab(wrap);
+
+      const tags = wrap.querySelector('.submenu-box');
+      if (tags) mobileTipBox.innerHTML = tags.innerHTML;
+
+      scrollActiveIntoView(wrap, !(opts && opts.instant));
+      positionMobileTip(wrap);
+    }
+
+    tabWraps.forEach((wrap) => {
+      wrap.querySelector('.tab-btn').addEventListener('click', () => {
+        // switching to a different tab always starts from the top of the page
+        if (!wrap.classList.contains('active')) window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+        const wasActive = wrap.classList.contains('active');
+        setActive(wrap);
+        // mobile: tapping the already-active menu toggles its tip; switching
+        // to another menu just changes the tab and hides the tip
+        if (headerMobileQuery.matches) {
+          document.body.classList.toggle('mobile-tip-open', wasActive && !document.body.classList.contains('mobile-tip-open'));
+        }
+      });
+    });
+
+    const initialActive = document.querySelector('.tab-wrap.active');
+    if (initialActive) {
+      applyContent(initialActive);
+      updateVideoFab(initialActive);
+      scrollActiveIntoView(initialActive, false);
+      positionMobileTip(initialActive);
+      // re-run once fonts/layout have fully settled, in case web font
+      // loading shifted tab widths after the first measurement
+      if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(() => {
+          scrollActiveIntoView(initialActive, false);
+              positionMobileTip(initialActive);
+        });
+      }
+      window.addEventListener('load', () => {
+        scrollActiveIntoView(initialActive, false);
+          positionMobileTip(initialActive);
+      });
+    }
+
+    contentMobileQuery.addEventListener('change', () => {
+      const activeWrap = document.querySelector('.tab-wrap.active');
+      if (activeWrap) applyContent(activeWrap);
+    });
+
+    headerMobileQuery.addEventListener('change', () => {
+      const activeWrap = document.querySelector('.tab-wrap.active');
+      if (activeWrap) {
+        scrollActiveIntoView(activeWrap, false);
+        positionMobileTip(activeWrap);
+      }
+      updateTipVisibility();
+    });
+
+    // keep the active box centered without clipping on the left as the PC
+    // header shrinks, and pin it to x:24 the instant it would otherwise get
+    // cut off — rAF-throttled (not debounced) so it tracks live while the
+    // window is actively being dragged, not just after it settles
+    let resizeFrame = null;
+    window.addEventListener('resize', () => {
+      if (resizeFrame) return;
+      resizeFrame = requestAnimationFrame(() => {
+        resizeFrame = null;
+        const activeWrap = document.querySelector('.tab-wrap.active');
+        if (activeWrap) {
+          scrollActiveIntoView(activeWrap, false);
+            positionMobileTip(activeWrap);
+        }
+      });
+    });
+
+    // re-align the tip if nav.menu gets scrolled horizontally (desktop
+    // narrow-window scroll, or mobile's own horizontal scroll)
+    navMenu.addEventListener('scroll', () => {
+      const activeWrap = document.querySelector('.tab-wrap.active');
+      if (!activeWrap) return;
+      positionMobileTip(activeWrap);
+    }, { passive: true });
+
+    // mobile only: the tip opens on menu tap and closes once the page scrolls
+    // down or anywhere outside the menu is tapped
+    function updateTipVisibility() {
+      if (!headerMobileQuery.matches || window.scrollY > 10) {
+        document.body.classList.remove('mobile-tip-open');
+      }
+    }
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.tab-wrap')) document.body.classList.remove('mobile-tip-open');
+    });
+    window.addEventListener('scroll', updateTipVisibility, { passive: true });
+    updateTipVisibility();
+
+    // GSAP ScrollTrigger: whichever tab is active, its box fills left -> right
+    // mapped to the entire page scroll range.
+    gsap.registerPlugin(ScrollTrigger);
+
+    gsap.to('.pill-fill', {
+      clipPath: 'inset(0 0% 0 0)',
+      ease: 'none',
+      scrollTrigger: {
+        trigger: document.body,
+        start: 'top top',
+        end: 'max',
+        scrub: true,
+      },
+    });
+  </script>
+</body>
+</html>
