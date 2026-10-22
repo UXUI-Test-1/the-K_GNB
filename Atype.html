@@ -898,7 +898,23 @@
     // desktop (narrowed, still centered): leave the centered scroll position
     // alone as long as the box is visible, and only snap it to x:24 once
     // it would otherwise be scrolled out of view.
+    // mobile: when the whole menu is narrower than the screen (10px side
+    // margins), widen the selected menu's right padding so the row fills the
+    // screen exactly; if it overflows, leave it alone and let it scroll
+    function fitMenuWidth() {
+      const track = navMenu.querySelector('.menu-track');
+      tabWraps.forEach((w) => { w.querySelector('.tab-pill').style.paddingRight = ''; });
+      if (!headerMobileQuery.matches) return;
+      const active = document.querySelector('.tab-wrap.active .tab-pill');
+      if (!active) return;
+      const cs = getComputedStyle(navMenu);
+      const avail = navMenu.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+      const extra = avail - track.getBoundingClientRect().width;
+      if (extra > 0) active.style.paddingRight = (parseFloat(getComputedStyle(active).paddingRight) + extra) + 'px';
+    }
+
     function scrollActiveIntoView(wrap, smooth) {
+      fitMenuWidth();
       const navRect = navMenu.getBoundingClientRect();
       const wrapRect = wrap.getBoundingClientRect();
 
