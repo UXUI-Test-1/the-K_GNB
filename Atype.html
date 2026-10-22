@@ -930,6 +930,12 @@
         if (visible) return;
       }
 
+      // 1~4편 selected: keep the whole row left-aligned (scroll position 0)
+      if (headerMobileQuery.matches && Array.from(tabWraps).indexOf(wrap) <= 3) {
+        navMenu.scrollTo({ left: 0, behavior: smooth ? 'smooth' : 'auto' });
+        return;
+      }
+
       const delta = wrapRect.left - navRect.left;
       const target = Math.max(0, navMenu.scrollLeft + delta - 24);
       navMenu.scrollTo({ left: target, behavior: smooth ? 'smooth' : 'auto' });
