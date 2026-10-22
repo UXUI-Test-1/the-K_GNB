@@ -534,9 +534,15 @@
     }
     .mobile-tip .submenu-box a { font-size: 12px; letter-spacing: -0.36px; }
 
+    /* 5~8편: tip is centered on the screen (Figma "tip" node 20862:107671) */
+    .mobile-tip--center { transform: translateX(-50%); }
+
     .mobile-tip-arrow {
-      width: 262px;
+      /* the tail's x is set from JS (--tail-x) so it always points at the
+         center of the selected menu */
+      width: 15px;
       height: 22px;
+      margin-left: calc(var(--tail-x, 24px) - 7.5px);
       transform: scaleY(-1);
     }
   }
@@ -552,9 +558,9 @@
        <div class="menu-track">
         <div class="tab-wrap" data-key="firstpay" data-tab-color="#FF2465" data-content="assets/content-firstpay-v2.jpg" data-content-mobile="assets/content-firstpay-mobile.jpg" data-fab-bg="#FF5285" data-fab-color="#FF5285" data-fab-type="video" data-fab-media="assets/1편.mp4" data-fab-img-style="width:100%;height:100%;left:0;top:0;">
           <button class="tab-btn" type="button">
-            <span class="tab-plain"><span class="tab-icon"><picture><source media="(max-width: 768px)" srcset="assets/gnb/a/icon-m1.png" /><img src="assets/gnb/a/icon-d1.png" alt="" /></picture></span><span class="tab-text">장기저축급여</span></span>
+            <span class="tab-plain"><span class="tab-icon"><picture><source media="(max-width: 768px)" srcset="assets/gnb/v2/icon-m1.png" /><img src="assets/gnb/v2/icon-d1.png" alt="" /></picture></span><span class="tab-text">장기저축급여</span></span>
             <span class="tab-pill">
-              <span class="tab-icon"><picture><source media="(max-width: 768px)" srcset="assets/gnb/a/icon-m1.png" /><img src="assets/gnb/a/icon-d1.png" alt="" /></picture></span><span class="pill-label pill-label--base">EP.01 장기저축급여</span>
+              <span class="tab-icon"><picture><source media="(max-width: 768px)" srcset="assets/gnb/v2/icon-m1.png" /><img src="assets/gnb/v2/icon-d1.png" alt="" /></picture></span><span class="pill-label pill-label--base">EP.01 장기저축급여</span>
               <span class="pill-fill" aria-hidden="true"><span class="pill-label">EP.01 장기저축급여</span></span>
             </span>
           </button>
@@ -573,9 +579,9 @@
 
         <div class="tab-wrap" data-key="retire" data-content="assets/content-retire-v2.jpg" data-content-mobile="assets/content-retire-mobile.jpg" data-fab-bg="#0F68EE" data-fab-color="#2853F6" data-fab-type="video" data-fab-media="assets/2편.mp4" data-fab-img-style="width:100%;height:100%;left:0;top:0;">
           <button class="tab-btn" type="button">
-            <span class="tab-plain"><span class="tab-icon"><picture><source media="(max-width: 768px)" srcset="assets/gnb/a/icon-m2.png" /><img src="assets/gnb/a/icon-d2.png" alt="" /></picture></span><span class="tab-text">분할급여금</span></span>
+            <span class="tab-plain"><span class="tab-icon"><picture><source media="(max-width: 768px)" srcset="assets/gnb/v2/icon-m2.png" /><img src="assets/gnb/v2/icon-d2.png" alt="" /></picture></span><span class="tab-text">분할급여금</span></span>
             <span class="tab-pill">
-              <span class="tab-icon"><picture><source media="(max-width: 768px)" srcset="assets/gnb/a/icon-m2.png" /><img src="assets/gnb/a/icon-d2.png" alt="" /></picture></span><span class="pill-label pill-label--base">EP.02 분할급여금</span>
+              <span class="tab-icon"><picture><source media="(max-width: 768px)" srcset="assets/gnb/v2/icon-m2.png" /><img src="assets/gnb/v2/icon-d2.png" alt="" /></picture></span><span class="pill-label pill-label--base">EP.02 분할급여금</span>
               <span class="pill-fill" aria-hidden="true"><span class="pill-label">EP.02 분할급여금</span></span>
             </span>
           </button>
@@ -594,9 +600,9 @@
 
         <div class="tab-wrap" data-key="deposit" data-content="assets/content-deposit-v2.jpg" data-content-mobile="assets/content-deposit-mobile.jpg" data-fab-bg="#8D3BFF" data-fab-color="#8D3BFF" data-fab-type="video" data-fab-media="assets/3편.mp4" data-fab-img-style="width:100%;height:100%;left:0;top:0;">
           <button class="tab-btn" type="button">
-            <span class="tab-plain"><span class="tab-icon"><picture><source media="(max-width: 768px)" srcset="assets/gnb/a/icon-m3.png" /><img src="assets/gnb/a/icon-d3.png" alt="" /></picture></span><span class="tab-text">증좌</span></span>
+            <span class="tab-plain"><span class="tab-icon"><picture><source media="(max-width: 768px)" srcset="assets/gnb/v2/icon-m3.png" /><img src="assets/gnb/v2/icon-d3.png" alt="" /></picture></span><span class="tab-text">증좌</span></span>
             <span class="tab-pill">
-              <span class="tab-icon"><picture><source media="(max-width: 768px)" srcset="assets/gnb/a/icon-m3.png" /><img src="assets/gnb/a/icon-d3.png" alt="" /></picture></span><span class="pill-label pill-label--base">EP.03 증좌</span>
+              <span class="tab-icon"><picture><source media="(max-width: 768px)" srcset="assets/gnb/v2/icon-m3.png" /><img src="assets/gnb/v2/icon-d3.png" alt="" /></picture></span><span class="pill-label pill-label--base">EP.03 증좌</span>
               <span class="pill-fill" aria-hidden="true"><span class="pill-label">EP.03 증좌</span></span>
             </span>
           </button>
@@ -615,9 +621,9 @@
 
         <div class="tab-wrap active" data-key="benefit" data-fab-label="장바구니 담으러 가기" data-fab-icon="assets/gnb/v2/icon-bag.svg" data-content="assets/content.jpg" data-fab-bg="#0F68EE" data-fab-color="#2853F6" data-fab-type="video" data-fab-media="assets/4편.mp4" data-fab-img-style="width:86px;height:86px;left:50%;top:calc(50% + 2px);transform:translate(-50%,-50%);">
           <button class="tab-btn" type="button">
-            <span class="tab-plain"><span class="tab-icon"><picture><source media="(max-width: 768px)" srcset="assets/gnb/a/icon-m4.png" /><img src="assets/gnb/a/icon-d4.png" alt="" /></picture></span><span class="tab-text">복지혜택</span></span>
+            <span class="tab-plain"><span class="tab-icon"><picture><source media="(max-width: 768px)" srcset="assets/gnb/v2/icon-m4.png" /><img src="assets/gnb/v2/icon-d4.png" alt="" /></picture></span><span class="tab-text">복지혜택</span></span>
             <span class="tab-pill">
-              <span class="tab-icon"><picture><source media="(max-width: 768px)" srcset="assets/gnb/a/icon-m4.png" /><img src="assets/gnb/a/icon-d4.png" alt="" /></picture></span><span class="pill-label pill-label--base">EP.04 복지혜택</span>
+              <span class="tab-icon"><picture><source media="(max-width: 768px)" srcset="assets/gnb/v2/icon-m4.png" /><img src="assets/gnb/v2/icon-d4.png" alt="" /></picture></span><span class="pill-label pill-label--base">EP.04 복지혜택</span>
               <span class="pill-fill" aria-hidden="true"><span class="pill-label">EP.04 복지혜택</span></span>
             </span>
           </button>
@@ -636,9 +642,9 @@
 
         <div class="tab-wrap" data-key="future" data-content="" data-blank-color="#E8F5E9" data-fab-bg="#2E9E44" data-fab-color="#2E9E44" data-fab-type="image" data-fab-media="assets/fab-blank-v2.png" data-fab-img-style="width:64px;height:64px;left:50%;top:50%;transform:translate(-50%,-50%);">
           <button class="tab-btn" type="button">
-            <span class="tab-plain"><span class="tab-icon"><picture><source media="(max-width: 768px)" srcset="assets/gnb/a/icon-m5.png" /><img src="assets/gnb/a/icon-d5.png" alt="" /></picture></span><span class="tab-text">혜택마트</span></span>
+            <span class="tab-plain"><span class="tab-icon"><picture><source media="(max-width: 768px)" srcset="assets/gnb/v2/icon-m5.png" /><img src="assets/gnb/v2/icon-d5.png" alt="" /></picture></span><span class="tab-text">혜택마트</span></span>
             <span class="tab-pill">
-              <span class="tab-icon"><picture><source media="(max-width: 768px)" srcset="assets/gnb/a/icon-m5.png" /><img src="assets/gnb/a/icon-d5.png" alt="" /></picture></span><span class="pill-label pill-label--base">EP.05 혜택마트</span>
+              <span class="tab-icon"><picture><source media="(max-width: 768px)" srcset="assets/gnb/v2/icon-m5.png" /><img src="assets/gnb/v2/icon-d5.png" alt="" /></picture></span><span class="pill-label pill-label--base">EP.05 혜택마트</span>
               <span class="pill-fill" aria-hidden="true"><span class="pill-label">EP.05 혜택마트</span></span>
             </span>
           </button>
@@ -657,9 +663,9 @@
 
         <div class="tab-wrap" data-key="lowtax" data-content="" data-blank-color="#FFF9E6" data-fab-bg="#E6A700" data-fab-color="#E6A700" data-fab-type="image" data-fab-media="assets/fab-blank-v2.png" data-fab-img-style="width:64px;height:64px;left:50%;top:50%;transform:translate(-50%,-50%);">
           <button class="tab-btn" type="button">
-            <span class="tab-plain"><span class="tab-icon"><picture><source media="(max-width: 768px)" srcset="assets/gnb/a/icon-m6.png" /><img src="assets/gnb/a/icon-d6.png" alt="" /></picture></span><span class="tab-text">벽돌깨기</span></span>
+            <span class="tab-plain"><span class="tab-icon"><picture><source media="(max-width: 768px)" srcset="assets/gnb/v2/icon-m6.png" /><img src="assets/gnb/v2/icon-d6.png" alt="" /></picture></span><span class="tab-text">벽돌깨기</span></span>
             <span class="tab-pill">
-              <span class="tab-icon"><picture><source media="(max-width: 768px)" srcset="assets/gnb/a/icon-m6.png" /><img src="assets/gnb/a/icon-d6.png" alt="" /></picture></span><span class="pill-label pill-label--base">EP.06 벽돌깨기</span>
+              <span class="tab-icon"><picture><source media="(max-width: 768px)" srcset="assets/gnb/v2/icon-m6.png" /><img src="assets/gnb/v2/icon-d6.png" alt="" /></picture></span><span class="pill-label pill-label--base">EP.06 벽돌깨기</span>
               <span class="pill-fill" aria-hidden="true"><span class="pill-label">EP.06 벽돌깨기</span></span>
             </span>
           </button>
@@ -678,9 +684,9 @@
 
         <div class="tab-wrap" data-key="deduction" data-content="" data-blank-color="#F3E8FF" data-fab-bg="#8D3BFF" data-fab-color="#8D3BFF" data-fab-type="image" data-fab-media="assets/fab-blank-v2.png" data-fab-img-style="width:64px;height:64px;left:50%;top:50%;transform:translate(-50%,-50%);">
           <button class="tab-btn" type="button">
-            <span class="tab-plain"><span class="tab-icon"><picture><source media="(max-width: 768px)" srcset="assets/gnb/a/icon-m7.png" /><img src="assets/gnb/a/icon-d7.png" alt="" /></picture></span><span class="tab-text">증좌 2편</span></span>
+            <span class="tab-plain"><span class="tab-icon"><picture><source media="(max-width: 768px)" srcset="assets/gnb/v2/icon-m7.png" /><img src="assets/gnb/v2/icon-d7.png" alt="" /></picture></span><span class="tab-text">증좌 2편</span></span>
             <span class="tab-pill">
-              <span class="tab-icon"><picture><source media="(max-width: 768px)" srcset="assets/gnb/a/icon-m7.png" /><img src="assets/gnb/a/icon-d7.png" alt="" /></picture></span><span class="pill-label pill-label--base">EP.07 증좌 2편</span>
+              <span class="tab-icon"><picture><source media="(max-width: 768px)" srcset="assets/gnb/v2/icon-m7.png" /><img src="assets/gnb/v2/icon-d7.png" alt="" /></picture></span><span class="pill-label pill-label--base">EP.07 증좌 2편</span>
               <span class="pill-fill" aria-hidden="true"><span class="pill-label">EP.07 증좌 2편</span></span>
             </span>
           </button>
@@ -699,9 +705,9 @@
 
         <div class="tab-wrap" data-key="yearend" data-content="" data-blank-color="#FFF0E0" data-fab-bg="#FF7A00" data-fab-color="#FF7A00" data-fab-type="image" data-fab-media="assets/fab-blank-v2.png" data-fab-img-style="width:64px;height:64px;left:50%;top:50%;transform:translate(-50%,-50%);">
           <button class="tab-btn" type="button">
-            <span class="tab-plain"><span class="tab-icon"><picture><source media="(max-width: 768px)" srcset="assets/gnb/a/icon-m8.png" /><img src="assets/gnb/a/icon-d8.png" alt="" /></picture></span><span class="tab-text">분할급여금 2편</span></span>
+            <span class="tab-plain"><span class="tab-icon"><picture><source media="(max-width: 768px)" srcset="assets/gnb/v2/icon-m8.png" /><img src="assets/gnb/v2/icon-d8.png" alt="" /></picture></span><span class="tab-text">분할급여금 2편</span></span>
             <span class="tab-pill">
-              <span class="tab-icon"><picture><source media="(max-width: 768px)" srcset="assets/gnb/a/icon-m8.png" /><img src="assets/gnb/a/icon-d8.png" alt="" /></picture></span><span class="pill-label pill-label--base">EP.08 분할급여금 2편</span>
+              <span class="tab-icon"><picture><source media="(max-width: 768px)" srcset="assets/gnb/v2/icon-m8.png" /><img src="assets/gnb/v2/icon-d8.png" alt="" /></picture></span><span class="pill-label pill-label--base">EP.08 분할급여금 2편</span>
               <span class="pill-fill" aria-hidden="true"><span class="pill-label">EP.08 분할급여금 2편</span></span>
             </span>
           </button>
@@ -727,8 +733,8 @@
           <a href="#">#회원복지</a>
           <a href="#">#복지알림</a>
         </div>
-        <svg class="mobile-tip-arrow" viewBox="0 0 262 22" preserveAspectRatio="xMidYMin meet" xmlns="http://www.w3.org/2000/svg">
-          <path d="M28.4019 17.5C29.5566 19.5 32.4434 19.5 33.5981 17.5L37.0622 11.5C38.2169 9.5 36.7735 7 34.4641 7H27.5359C25.2265 7 23.7831 9.5 24.9378 11.5L28.4019 17.5Z" fill="white"/>
+        <svg class="mobile-tip-arrow" viewBox="95.5 0 15 22" xmlns="http://www.w3.org/2000/svg">
+          <path d="M100.402 17.5C101.557 19.5 104.443 19.5 105.598 17.5L109.062 11.5C110.217 9.5 108.774 7 106.464 7H99.5359C97.2265 7 95.7831 9.5 96.9378 11.5L100.402 17.5Z" fill="white"/>
         </svg>
       </div>
     </header>
@@ -987,7 +993,14 @@
       const btnRect = wrap.querySelector('.tab-pill').getBoundingClientRect();
       // follows its tab exactly while the menu scrolls (any overflow past the
       // viewport edge is clipped by html/body overflow-x: clip)
-      mobileTip.style.left = (btnRect.left - headerRect.left) + 'px';
+      const centered = ['future', 'lowtax', 'deduction', 'yearend'].includes(wrap.dataset.key);
+      mobileTip.classList.toggle('mobile-tip--center', centered);
+      mobileTip.style.left = centered ? '50%' : (btnRect.left - headerRect.left) + 'px';
+      // point the tail at the horizontal center of the menu, kept inside the
+      // bubble's rounded corners
+      const boxRect = mobileTipBox.getBoundingClientRect();
+      const tailX = Math.min(Math.max(btnRect.left + btnRect.width / 2 - boxRect.left, 18), boxRect.width - 18);
+      mobileTip.style.setProperty('--tail-x', tailX + 'px');
       // the mobile tip lives outside .tab-wrap, so carry the tab color over
       const c = wrap.dataset.tabColor || wrap.dataset.fabColor;
       if (c) mobileTip.style.setProperty('--tab-color', c);
