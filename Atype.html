@@ -126,14 +126,14 @@
     height: 100%;
   }
 
-  /* plain (inactive) tab: 2px #ebebeb outline, icon + label */
+  /* plain (inactive) tab: 2px #b8defb outline, icon + label */
   .tab-plain {
     display: flex;
     align-items: center;
     gap: 8px;
     height: 56px;
     padding: 0 18px 0 6px;
-    border: 2px solid #ebebeb;
+    border: 2px solid #b8defb;
     border-radius: 16px;
     font-weight: 700;
     font-size: 24px;
@@ -144,12 +144,6 @@
     transition: color 0.2s ease, border-color 0.2s ease;
   }
 
-  /* hover = same color as the active (pill) state */
-  .tab-btn:hover .tab-plain {
-    color: var(--tab-color, var(--blue-accent));
-    border-color: color-mix(in srgb, var(--tab-color, var(--blue-accent)) 15%, #fff);
-  }
-
   /* boxed (active) tab with scroll fill */
   .tab-pill {
     display: none;
@@ -157,7 +151,8 @@
     overflow: hidden;
     align-items: center;
     gap: 8px;
-    background: color-mix(in srgb, var(--tab-color, var(--blue-accent)) 15%, #fff);
+    /* selected = solid tab color; scrolling sweeps the light tint over it */
+    background: var(--tab-color, var(--blue-accent));
     border-radius: 16px;
     height: 56px;
     padding: 0 20px 0 8px;
@@ -177,7 +172,7 @@
   .pill-label--base {
     position: relative;
     z-index: 1;
-    color: var(--tab-color, var(--blue-accent));
+    color: #fff;
   }
 
   .pill-fill {
@@ -186,7 +181,7 @@
     display: flex;
     align-items: center;
     padding-left: 56px;
-    background: var(--tab-color, var(--blue-accent));
+    background: var(--tab-light, color-mix(in srgb, var(--tab-color, var(--blue-accent)) 40%, #fff));
     color: #fff;
     clip-path: inset(0 100% 0 0);
     will-change: clip-path;
@@ -231,12 +226,8 @@
     color: var(--tab-color, var(--blue-accent));
     text-decoration: none;
     cursor: pointer;
-    transition: font-weight 0.15s ease;
   }
 
-  .submenu-box a:hover {
-    font-weight: 700;
-  }
 
   .submenu-arrow {
     position: relative;
@@ -493,7 +484,7 @@
       justify-content: center;
       gap: 0;
       padding: 0;
-      border: 1px solid #ebebeb;
+      border: 1px solid #b8defb;
       border-radius: 10px;
       background: #fff;
     }
@@ -521,28 +512,28 @@
       pointer-events: none;
       /* shown only after a menu tap (body.mobile-tip-open) */
       opacity: 0;
-      filter: drop-shadow(0px 4px 7.5px rgba(0, 0, 0, 0.15));
+      filter: drop-shadow(0px 3.145px 5.897px rgba(0, 0, 0, 0.15));
       transition: opacity 0.3s ease;
     }
     body.mobile-tip-open .mobile-tip { opacity: 1; }
 
     .mobile-tip .submenu-box {
-      margin-top: -10px;
-      gap: 12px;
-      padding: 10px 12px;
-      border-radius: 12px;
+      margin-top: -7.5px;
+      gap: 9px;
+      padding: 7.863px 9.435px;
+      border-radius: 9.435px;
     }
-    .mobile-tip .submenu-box a { font-size: 12px; letter-spacing: -0.36px; }
+    .mobile-tip .submenu-box a { font-size: 9px; letter-spacing: -0.27px; }
 
-    /* 5~8편: tip is centered on the screen (Figma "tip" node 20862:107671) */
+    /* 6~8편: tip is centered on the screen (1~5편 are left-aligned with their menu) */
     .mobile-tip--center { transform: translateX(-50%); }
 
     .mobile-tip-arrow {
       /* the tail's x is set from JS (--tail-x) so it always points at the
          center of the selected menu */
-      width: 15px;
-      height: 22px;
-      margin-left: calc(var(--tail-x, 24px) - 7.5px);
+      width: 11.59px;
+      height: 17px;
+      margin-left: calc(var(--tail-x, 24px) - 5.8px);
       transform: scaleY(-1);
     }
   }
@@ -556,7 +547,7 @@
       </div>
       <nav class="menu" id="navMenu">
        <div class="menu-track">
-        <div class="tab-wrap" data-key="firstpay" data-tab-color="#FF2465" data-content="assets/content-firstpay-v2.jpg" data-content-mobile="assets/content-firstpay-mobile.jpg" data-fab-bg="#FF5285" data-fab-color="#FF5285" data-fab-type="video" data-fab-media="assets/1편.mp4" data-fab-img-style="width:100%;height:100%;left:0;top:0;">
+        <div class="tab-wrap" data-key="firstpay" data-tab-light="#FF467D" data-tab-color="#FF2465" data-content="assets/content-firstpay-v2.jpg" data-content-mobile="assets/content-firstpay-mobile.jpg" data-fab-bg="#FF5285" data-fab-color="#FF5285" data-fab-type="video" data-fab-media="assets/1편.mp4" data-fab-img-style="width:100%;height:100%;left:0;top:0;">
           <button class="tab-btn" type="button">
             <span class="tab-plain"><span class="tab-icon"><picture><source media="(max-width: 768px)" srcset="assets/gnb/v2/icon-m1.png" /><img src="assets/gnb/v2/icon-d1.png" alt="" /></picture></span><span class="tab-text">장기저축급여</span></span>
             <span class="tab-pill">
@@ -577,7 +568,7 @@
           </div>
         </div>
 
-        <div class="tab-wrap" data-key="retire" data-content="assets/content-retire-v2.jpg" data-content-mobile="assets/content-retire-mobile.jpg" data-fab-bg="#0F68EE" data-fab-color="#2853F6" data-fab-type="video" data-fab-media="assets/2편.mp4" data-fab-img-style="width:100%;height:100%;left:0;top:0;">
+        <div class="tab-wrap" data-key="retire" data-tab-light="#46A4F9" data-content="assets/content-retire-v2.jpg" data-content-mobile="assets/content-retire-mobile.jpg" data-fab-bg="#0F68EE" data-fab-color="#2853F6" data-fab-type="video" data-fab-media="assets/2편.mp4" data-fab-img-style="width:100%;height:100%;left:0;top:0;">
           <button class="tab-btn" type="button">
             <span class="tab-plain"><span class="tab-icon"><picture><source media="(max-width: 768px)" srcset="assets/gnb/v2/icon-m2.png" /><img src="assets/gnb/v2/icon-d2.png" alt="" /></picture></span><span class="tab-text">분할급여금</span></span>
             <span class="tab-pill">
@@ -598,7 +589,7 @@
           </div>
         </div>
 
-        <div class="tab-wrap" data-key="deposit" data-content="assets/content-deposit-v2.jpg" data-content-mobile="assets/content-deposit-mobile.jpg" data-fab-bg="#8D3BFF" data-fab-color="#8D3BFF" data-fab-type="video" data-fab-media="assets/3편.mp4" data-fab-img-style="width:100%;height:100%;left:0;top:0;">
+        <div class="tab-wrap" data-key="deposit" data-tab-light="#A25FFF" data-content="assets/content-deposit-v2.jpg" data-content-mobile="assets/content-deposit-mobile.jpg" data-fab-bg="#8D3BFF" data-fab-color="#8D3BFF" data-fab-type="video" data-fab-media="assets/3편.mp4" data-fab-img-style="width:100%;height:100%;left:0;top:0;">
           <button class="tab-btn" type="button">
             <span class="tab-plain"><span class="tab-icon"><picture><source media="(max-width: 768px)" srcset="assets/gnb/v2/icon-m3.png" /><img src="assets/gnb/v2/icon-d3.png" alt="" /></picture></span><span class="tab-text">증좌</span></span>
             <span class="tab-pill">
@@ -619,7 +610,7 @@
           </div>
         </div>
 
-        <div class="tab-wrap active" data-key="benefit" data-fab-label="장바구니 담으러 가기" data-fab-icon="assets/gnb/v2/icon-bag.svg" data-content="assets/content.jpg" data-fab-bg="#0F68EE" data-fab-color="#2853F6" data-fab-type="video" data-fab-media="assets/4편.mp4" data-fab-img-style="width:86px;height:86px;left:50%;top:calc(50% + 2px);transform:translate(-50%,-50%);">
+        <div class="tab-wrap active" data-key="benefit" data-tab-light="#46A4F9" data-fab-label="장바구니 담으러 가기" data-fab-icon="assets/gnb/v2/icon-bag.svg" data-content="assets/content.jpg" data-fab-bg="#0F68EE" data-fab-color="#2853F6" data-fab-type="video" data-fab-media="assets/4편.mp4" data-fab-img-style="width:86px;height:86px;left:50%;top:calc(50% + 2px);transform:translate(-50%,-50%);">
           <button class="tab-btn" type="button">
             <span class="tab-plain"><span class="tab-icon"><picture><source media="(max-width: 768px)" srcset="assets/gnb/v2/icon-m4.png" /><img src="assets/gnb/v2/icon-d4.png" alt="" /></picture></span><span class="tab-text">복지혜택</span></span>
             <span class="tab-pill">
@@ -640,7 +631,7 @@
           </div>
         </div>
 
-        <div class="tab-wrap" data-key="future" data-content="" data-blank-color="#E8F5E9" data-fab-bg="#2E9E44" data-fab-color="#2E9E44" data-fab-type="image" data-fab-media="assets/fab-blank-v2.png" data-fab-img-style="width:64px;height:64px;left:50%;top:50%;transform:translate(-50%,-50%);">
+        <div class="tab-wrap" data-key="future" data-tab-light="#32B14B" data-content="" data-blank-color="#E8F5E9" data-fab-bg="#2E9E44" data-fab-color="#2E9E44" data-fab-type="image" data-fab-media="assets/fab-blank-v2.png" data-fab-img-style="width:64px;height:64px;left:50%;top:50%;transform:translate(-50%,-50%);">
           <button class="tab-btn" type="button">
             <span class="tab-plain"><span class="tab-icon"><picture><source media="(max-width: 768px)" srcset="assets/gnb/v2/icon-m5.png" /><img src="assets/gnb/v2/icon-d5.png" alt="" /></picture></span><span class="tab-text">혜택마트</span></span>
             <span class="tab-pill">
@@ -661,7 +652,7 @@
           </div>
         </div>
 
-        <div class="tab-wrap" data-key="lowtax" data-content="" data-blank-color="#FFF9E6" data-fab-bg="#E6A700" data-fab-color="#E6A700" data-fab-type="image" data-fab-media="assets/fab-blank-v2.png" data-fab-img-style="width:64px;height:64px;left:50%;top:50%;transform:translate(-50%,-50%);">
+        <div class="tab-wrap" data-key="lowtax" data-tab-light="#FFBA02" data-content="" data-blank-color="#FFF9E6" data-fab-bg="#E6A700" data-fab-color="#E6A700" data-fab-type="image" data-fab-media="assets/fab-blank-v2.png" data-fab-img-style="width:64px;height:64px;left:50%;top:50%;transform:translate(-50%,-50%);">
           <button class="tab-btn" type="button">
             <span class="tab-plain"><span class="tab-icon"><picture><source media="(max-width: 768px)" srcset="assets/gnb/v2/icon-m6.png" /><img src="assets/gnb/v2/icon-d6.png" alt="" /></picture></span><span class="tab-text">벽돌깨기</span></span>
             <span class="tab-pill">
@@ -682,7 +673,7 @@
           </div>
         </div>
 
-        <div class="tab-wrap" data-key="deduction" data-content="" data-blank-color="#F3E8FF" data-fab-bg="#8D3BFF" data-fab-color="#8D3BFF" data-fab-type="image" data-fab-media="assets/fab-blank-v2.png" data-fab-img-style="width:64px;height:64px;left:50%;top:50%;transform:translate(-50%,-50%);">
+        <div class="tab-wrap" data-key="deduction" data-tab-light="#A25FFF" data-content="" data-blank-color="#F3E8FF" data-fab-bg="#8D3BFF" data-fab-color="#8D3BFF" data-fab-type="image" data-fab-media="assets/fab-blank-v2.png" data-fab-img-style="width:64px;height:64px;left:50%;top:50%;transform:translate(-50%,-50%);">
           <button class="tab-btn" type="button">
             <span class="tab-plain"><span class="tab-icon"><picture><source media="(max-width: 768px)" srcset="assets/gnb/v2/icon-m7.png" /><img src="assets/gnb/v2/icon-d7.png" alt="" /></picture></span><span class="tab-text">증좌 2편</span></span>
             <span class="tab-pill">
@@ -703,7 +694,7 @@
           </div>
         </div>
 
-        <div class="tab-wrap" data-key="yearend" data-content="" data-blank-color="#FFF0E0" data-fab-bg="#FF7A00" data-fab-color="#FF7A00" data-fab-type="image" data-fab-media="assets/fab-blank-v2.png" data-fab-img-style="width:64px;height:64px;left:50%;top:50%;transform:translate(-50%,-50%);">
+        <div class="tab-wrap" data-key="yearend" data-tab-light="#FF891D" data-content="" data-blank-color="#FFF0E0" data-fab-bg="#FF7A00" data-fab-color="#FF7A00" data-fab-type="image" data-fab-media="assets/fab-blank-v2.png" data-fab-img-style="width:64px;height:64px;left:50%;top:50%;transform:translate(-50%,-50%);">
           <button class="tab-btn" type="button">
             <span class="tab-plain"><span class="tab-icon"><picture><source media="(max-width: 768px)" srcset="assets/gnb/v2/icon-m8.png" /><img src="assets/gnb/v2/icon-d8.png" alt="" /></picture></span><span class="tab-text">분할급여금 2편</span></span>
             <span class="tab-pill">
@@ -822,7 +813,12 @@
   <script>
     const tabWraps = document.querySelectorAll('.tab-wrap');
     // each tab's fill/text color = its floating widget's text color
-    tabWraps.forEach((w) => { const c = w.dataset.tabColor || w.dataset.fabColor; if (c) w.style.setProperty('--tab-color', c); });
+    tabWraps.forEach((w) => {
+      const c = w.dataset.tabColor || w.dataset.fabColor;
+      if (c) w.style.setProperty('--tab-color', c);
+      // lighter shade the selected tab scrolls into (4편 = #46A4F9)
+      if (w.dataset.tabLight) w.style.setProperty('--tab-light', w.dataset.tabLight);
+    });
     const contentImage = document.getElementById('contentImage');
     const benefitFrame = document.getElementById('benefitFrame');
     const futureFrame = document.getElementById('futureFrame');
@@ -993,13 +989,18 @@
       const btnRect = wrap.querySelector('.tab-pill').getBoundingClientRect();
       // follows its tab exactly while the menu scrolls (any overflow past the
       // viewport edge is clipped by html/body overflow-x: clip)
-      const centered = ['future', 'lowtax', 'deduction', 'yearend'].includes(wrap.dataset.key);
+      const centered = ['lowtax', 'deduction', 'yearend'].includes(wrap.dataset.key);
       mobileTip.classList.toggle('mobile-tip--center', centered);
-      mobileTip.style.left = centered ? '50%' : (btnRect.left - headerRect.left) + 'px';
+      // left-aligned tips are pulled back just enough to stay on screen
+      const tipW = mobileTipBox.getBoundingClientRect().width;
+      const maxLeft = headerRect.width - tipW - 8;
+      mobileTip.style.left = centered
+        ? '50%'
+        : Math.max(8, Math.min(btnRect.left - headerRect.left, maxLeft)) + 'px';
       // point the tail at the horizontal center of the menu, kept inside the
       // bubble's rounded corners
       const boxRect = mobileTipBox.getBoundingClientRect();
-      const tailX = Math.min(Math.max(btnRect.left + btnRect.width / 2 - boxRect.left, 18), boxRect.width - 18);
+      const tailX = Math.min(Math.max(btnRect.left + btnRect.width / 2 - boxRect.left, 14), boxRect.width - 14);
       mobileTip.style.setProperty('--tail-x', tailX + 'px');
       // the mobile tip lives outside .tab-wrap, so carry the tab color over
       const c = wrap.dataset.tabColor || wrap.dataset.fabColor;
